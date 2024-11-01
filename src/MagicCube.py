@@ -102,7 +102,40 @@ class MagicCube:
             b (tuple): indeks elemen kedua
         """
         self.cube[a], self.cube[b] = self.cube[b], self.cube[a]
-        
+        self.refresh()
+
+    def scramble(self, start: int, end: int) -> None:
+        """
+        mengacak elemen kubus pada range tertentu
+
+        Args:
+            start (int): indeks awal
+            end (int): indeks akhir
+        """
+        # ubah cube menjadi 1 dimensi
+        cube = self.cube.flatten()
+        # acak elemen pada range tertentu
+        cube[start:end] = np.random.permutation(cube[start:end])
+        # ubah cube menjadi 3 dimensi
+        self.cube = cube.reshape(5,5,5)
+        self.refresh()
+
+    def inverse(self, start: int, end: int) -> None:
+        """
+        membalik elemen kubus pada range tertentu
+
+        Args:
+            start (int): indeks awal
+            end (int): indeks akhir
+        """
+        # ubah cube menjadi 1 dimensi
+        cube = self.cube.flatten()
+        # balik elemen pada range tertentu
+        cube[start:end] = cube[start:end][::-1]
+        # ubah cube menjadi 3 dimensi
+        self.cube = cube.reshape(5,5,5)
+        self.refresh()
+
     def highestSuccessor(self) -> None:
         """
         mengembalikan succussor dengan objective value tertinggi
@@ -121,7 +154,6 @@ class MagicCube:
                                 new_cube = MagicCube()
                                 new_cube.cube = self.cube.copy()
                                 new_cube.swap((x1, y1, z1), (x2, y2, z2))
-                                new_cube.refresh()
 
                                 if new_cube.value > max_value:
                                     max_value = new_cube.value
@@ -135,23 +167,49 @@ class MagicCube:
         return:
         Cube: objek kubus successor
         """
-        x1, y1, z1 = random.randint(0, 4), random.randint(0, 4), random.randint(0, 4)
-        x2, y2, z2 = random.randint(0, 4), random.randint(0, 4), random.randint(0, 4)
-        while (x1, y1, z1) == (x2, y2, z2):
-            l, m, n = random.randint(0, 4), random.randint(0, 4), random.randint(0, 4)
+        first_elmt = tuple(np.random.randint(5, size=3))
+        second_elmt = tuple(np.random.randint(5, size=3))
+        while first_elmt == second_elmt:
+            second_elmt = tuple(np.random.randint(5, size=3))
 
         new_cube = MagicCube()
         new_cube.cube = self.cube.copy()
-        new_cube.swap((x1, y1, z1), (x2, y2, z2))
-        new_cube.refresh()
+        new_cube.swap(first_elmt, second_elmt)
 
         return new_cube
+
+# Testing
+if __name__ == "__main__":
+    cube = MagicCube()
+    print(cube.cube[0, 0, 0])
+    print(cube.cube)
+    cube.cube[0, 0, 0] = 1
+    print(cube.cube[0, 0, 0])
+    print(cube.cube)
+    print(cube.value)
+    print(cube.fitness)
+
+    high = cube.highestSuccessor()
+    # print(high.cube)
+    print(high.value)
+    print(high.fitness)
     
-# Test
-a = MagicCube()
-print(a.cube)
-print(a.value)
-print(a.fitness)
-a.swap((1,1,1),(2,2,2))
-print(a.highestSuccessor().value)
-print(a.randomSuccessor().value)
+    random = cube.randomSuccessor()
+    # print(random.cube)
+    print(random.value)
+    print(random.fitness)
+
+    cube.swap((0, 0, 0), (0, 0, 1))
+    print(cube.cube)
+    print(cube.value)
+    print(cube.fitness)
+
+    cube.scramble(0, 10)
+    print(cube.cube)
+    print(cube.value)
+    print(cube.fitness)
+
+    cube.inverse(0, 10)
+    print(cube.cube)
+    print(cube.value)
+    print(cube.fitness)
