@@ -10,18 +10,19 @@ class MagicCube:
         self.cube = list(range(1, 126))
         random.shuffle(self.cube)
         self.cube = np.array(self.cube).reshape(5,5,5)
+        
         self.value = self.__value()
         self.fitness = self.__fitness()
     
     def __getitem__(self, key: tuple) -> int:
         """
-        mengembalikan elemen kubus pada indeks tertentu
+        mengembalikan nilai elemen kubus pada indeks tertentu
 
         Args:
             key (tuple): indeks elemen kubus
 
         return:
-        int: elemen kubus pada indeks tertentu
+        int: nilai elemen kubus
         """
         return self.cube[key]
 
@@ -40,11 +41,11 @@ class MagicCube:
         # Mengecek baris, kolom, dan tiang
         for i in range(5):
             for j in range(5):
-                if np.sum(self[i, j, :]) != target:  # Baris sepanjang sumbu z
+                if np.sum(self[i, j, :]) != target:  # Baris
                     count_mismatch += 1
-                if np.sum(self[i, :, j]) != target:  # Kolom sepanjang sumbu y
+                if np.sum(self[i, :, j]) != target:  # Kolom
                     count_mismatch += 1
-                if np.sum(self[:, i, j]) != target:  # Tiang sepanjang sumbu x
+                if np.sum(self[:, i, j]) != target:  # Tiang
                     count_mismatch += 1
 
         # Mengecek diagonal pada setiap potongan bidang
@@ -84,6 +85,13 @@ class MagicCube:
         int: nilai fitness kubus
         """
         return 109 + self.value
+    
+    def refresh(self) -> None:
+        """
+        mengupdate nilai value dan fitness kubus
+        """
+        self.value = self.__value()
+        self.fitness = self.__fitness()
 
     def swap(self, a: tuple, b: tuple) -> None:
         """
@@ -104,20 +112,20 @@ class MagicCube:
         """
         max_value = -109
         max_cube = None
-        for i in range(5):
-            for j in range(5):
-                for k in range(5):
-                    for l in range(i, 5):
-                        for m in range(j, 5):
-                            for n in range(k, 5):
+        for x1 in range(5):
+            for y1 in range(5):
+                for z1 in range(5):
+                    for x2 in range(x1, 5):
+                        for y2 in range(y1, 5):
+                            for z2 in range(z1 + 1, 5):
                                 new_cube = MagicCube()
                                 new_cube.cube = self.cube.copy()
-                                new_cube.swap((i, j, k), (l, m, n))
-                                new_value = new_cube.value
-                                if new_value > max_value:
-                                    max_value = new_value
-                                    max_cube = new_cube
+                                new_cube.swap((x1, y1, z1), (x2, y2, z2))
+                                new_cube.refresh()
 
+                                if new_cube.value > max_value:
+                                    max_value = new_cube.value
+                                    max_cube = new_cube
         return max_cube
 
     def randomSuccessor(self) -> None:
@@ -127,11 +135,15 @@ class MagicCube:
         return:
         Cube: objek kubus successor
         """
-        i, j, k = random.randint(0, 4), random.randint(0, 4), random.randint(0, 4)
-        l, m, n = random.randint(i, 4), random.randint(j, 4), random.randint(k, 4)
+        x1, y1, z1 = random.randint(0, 4), random.randint(0, 4), random.randint(0, 4)
+        x2, y2, z2 = random.randint(0, 4), random.randint(0, 4), random.randint(0, 4)
+        while (x1, y1, z1) == (x2, y2, z2):
+            l, m, n = random.randint(0, 4), random.randint(0, 4), random.randint(0, 4)
+
         new_cube = MagicCube()
         new_cube.cube = self.cube.copy()
-        new_cube.swap((i, j, k), (l, m, n))
+        new_cube.swap((x1, y1, z1), (x2, y2, z2))
+        new_cube.refresh()
 
         return new_cube
     
