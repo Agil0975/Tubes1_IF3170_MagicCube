@@ -31,7 +31,7 @@ class HillClimbing:
         """
         return cube
     
-    def randomRestart(self, cube: MagicCube) -> MagicCube:
+    def randomRestart(self, cube: MagicCube, max_restarts: int) -> MagicCube:
         """
         melakukan pencarian random restart hill-climbing pada kubus magic
 
@@ -41,9 +41,22 @@ class HillClimbing:
         return:
         MagicCube: objek kubus hasil pencarian
         """
-        return cube
+
+        if cube.value == 0:
+            return cube
+
+        for i in range(max_restarts):
+            steepest_ascent_result = self.steepestAscent(cube)
+            
+            if steepest_ascent_result.value == 0:
+                return steepest_ascent_result
+            
+            if i < max_restarts - 1:
+                cube = MagicCube.MagicCube()
+
+        return steepest_ascent_result     
     
-    def stochastic(self, cube: MagicCube) -> MagicCube:
+    def stochastic(self, cube: MagicCube, max_iterations: int) -> MagicCube:
         """
         melakukan pencarian stochastic hill-climbing pada kubus magic
 
@@ -53,23 +66,22 @@ class HillClimbing:
         return:
         MagicCube: objek kubus hasil pencarian
         """
-        return cube
 
 hc = HillClimbing()
 cube = MagicCube.MagicCube()
 
 # Test steepestAscent
-result = hc.steepestAscent(cube)
-print(result)
+# result = hc.steepestAscent(cube)
+# print(result)
 
 # Test sidewaysMove
-result = hc.sidewaysMove(cube)
-print(result)
+# result = hc.sidewaysMove(cube)
+# print(result)
 
 # Test randomRestart
-result = hc.randomRestart(cube)
-print(result)
+# result = hc.randomRestart(cube)
+# print(result)
 
 # Test stochastic
-result = hc.stochastic(cube)
-print(result)
+# result = hc.stochastic(cube)
+# print(result)
