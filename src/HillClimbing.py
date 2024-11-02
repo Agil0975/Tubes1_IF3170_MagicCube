@@ -67,8 +67,22 @@ class HillClimbing:
         MagicCube: objek kubus hasil pencarian
         """
 
-hc = HillClimbing()
-cube = MagicCube.MagicCube()
+        if cube.value == 0:
+            return cube
+
+        for i in range(max_iterations):
+            neighbor = cube.randomSuccessor()
+            if neighbor.value > cube.value:
+                cube = neighbor
+            
+            if cube.value == 0:
+                return cube
+        
+        return cube
+
+
+# hc = HillClimbing()
+# cube = MagicCube.MagicCube()
 
 # Test steepestAscent
 # result = hc.steepestAscent(cube)
