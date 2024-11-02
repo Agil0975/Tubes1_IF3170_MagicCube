@@ -69,9 +69,22 @@ class HillClimbing:
         return:
         MagicCube: objek kubus hasil pencarian
         """
-        return cube
+
+        if cube.value == 0:
+            return cube
+
+        for i in range(max_restarts):
+            steepest_ascent_result = self.steepestAscent(cube)
+            
+            if steepest_ascent_result.value == 0:
+                return steepest_ascent_result
+            
+            if i < max_restarts - 1:
+                cube = MagicCube.MagicCube()
+
+        return steepest_ascent_result     
     
-    def stochastic(self, cube: MagicCube) -> MagicCube:
+    def stochastic(self, cube: MagicCube, max_iterations: int) -> MagicCube:
         """
         melakukan pencarian stochastic hill-climbing pada kubus magic
 
@@ -81,6 +94,18 @@ class HillClimbing:
         return:
         MagicCube: objek kubus hasil pencarian
         """
+
+        if cube.value == 0:
+            return cube
+
+        for i in range(max_iterations):
+            neighbor = cube.randomSuccessor()
+            if neighbor.value > cube.value:
+                cube = neighbor
+            
+            if cube.value == 0:
+                return cube
+        
         return cube
     
     def plot_objective_value(self, objective_value: list, message: str) -> None:
