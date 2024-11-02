@@ -1,6 +1,11 @@
 from MagicCube import MagicCube
+from utils.visualization import visualize_3d_cube_2
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 import random
+import time
 
 class GeneticAlgorithm:
     def __init__(self) -> None:
@@ -140,7 +145,6 @@ class GeneticAlgorithm:
                             if child_y == 5:
                                 child_y = 0
                                 child_x += 1
-
         return child
     
     def __order_crossover_xz(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
@@ -177,7 +181,6 @@ class GeneticAlgorithm:
                             if child_y == 5:
                                 child_y = cut
                                 child_x += 1
-
         return child
 
     def __order_crossover_yz(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
@@ -214,7 +217,6 @@ class GeneticAlgorithm:
                             if child_y == 5:
                                 child_y = 0
                                 child_x += 1
-
         return child
             
     def __mutation(self, individu: MagicCube, type: int = 1) -> None:
@@ -254,8 +256,8 @@ class GeneticAlgorithm:
     def run(self, 
             population: list, 
             population_size: int,
-            max_generation: int = 1000,
-            ) -> MagicCube:
+            max_generation: int
+            ) -> tuple:
         """
         Menjalankan algoritma genetika
 
@@ -265,15 +267,22 @@ class GeneticAlgorithm:
             max_generation (int): maksimum generasi
             
         Returns:
-            MagicCube: kubus magic terbaik
+            tuple: waktu eksekusi, ukuran populasi, jumlah generasi
         """
         current_generation = population
-        max_stuck = 50
         generation = 0
-        patient = 0
+        patient = 0 # jumlah generasi tanpa perubahan fitness terbaik
         total_fitness = self.__update_history(current_generation)
 
+        max_stuck = 0.1 * max_generation if max_generation >= 1000 else 0.2 * max_generation
+        batas_mutasi_rendah = 0.05 if population_size >= 100 else 0.01
+        batas_mutasi_tinggi = 0.1 if population_size >= 100 else 0.05
+        batas_elitisme = 0.05
+
+        start = time.time()
         while (current_generation[0].fitness < 109) and (generation < max_generation):
+            print(f"Generasi ke-{generation}, fitness terbaik: {current_generation[0].fitness}, patient: {patient}")
+            
             next_generation = []
             
             # Roulette wheel
@@ -281,10 +290,10 @@ class GeneticAlgorithm:
             
             # Elitisme
             if patient < max_stuck:
-                # ambil 5% individu terbaik
-                next_generation.extend(current_generation[:int(0.05*population_size)])
+                # ambil individu terbaik dari generasi sebelumnya
+                next_generation.extend(current_generation[:int(batas_elitisme * population_size)])
                 
-            # Seleksi dan Crossover            
+            # Seleksi dan Crossover
             for _ in range((population_size - len(next_generation)) // 2):
                 parent1, parent2 = self.__selection(roulette_wheel)
                 child1, child2 = self.__crossover(parent1, parent2, np.random.randint(1, 4))
@@ -292,12 +301,12 @@ class GeneticAlgorithm:
 
             # Mutasi
             if patient < max_stuck: # mutasi rendah
-                for i in range(len(next_generation)):
-                    if np.random.random() < 0.05:
+                for i in range(1, len(next_generation)): # lewati individu terbaik
+                    if np.random.random() < batas_mutasi_rendah:
                         self.__mutation(next_generation[i], np.random.randint(1, 4))
             else:   # mutasi tinggi
-                for i in range(len(next_generation)):
-                    if np.random.random() < 0.1:
+                for i in range(1, len(next_generation)): # lewati individu terbaik
+                    if np.random.random() < batas_mutasi_tinggi:
                         self.__mutation(next_generation[i], np.random.randint(1, 4))
 
             # Update generasi
@@ -311,47 +320,102 @@ class GeneticAlgorithm:
             else:
                 patient = 0
 
-            print(f"Generation {generation}: {current_generation[0].fitness}, {patient}")
             generation += 1
+        end = time.time()
 
+        return end - start, population_size, generation
+
+    def plot(self, time: float, population_size: int, max_generation: int) -> None:
+        """
+        Membuat plot hasil algoritma genetika
+
+        Args:
+            time (float): waktu eksekusi algoritma
+            population_size (int): ukuran populasi
+            max_generation (int): maksimum generasi
+        """
+        # Membuat figure dengan gridspec dan mengatur rasio
+        fig = plt.figure(figsize=(15, 12))
+        gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[70, 30])
+
+        # Baris 1, Kolom 1: Grafik garis avg dan max fitness
+        ax1 = fig.add_subplot(gs[0, 0])
+        ax1.plot(self.fitness_avg_history, label="Average Fitness", color="blue")
+        ax1.plot(self.fitness_max_history, label="Max Fitness", color="red")
+        ax1.set_title("Line Plot of Two Arrays")
+        ax1.set_xlabel("Generasi")
+        ax1.set_ylabel("Value")
+        ax1.legend()
+
+        # Baris 1, Kolom 2: Statistik algoritma genetika
+        ax2 = fig.add_subplot(gs[0, 1])
+        array_stats_text = f"""
+        Initial Maksimum Value    : {self.fitness_max_history[0]}
+        Final Maksimum Value      : {self.fitness_max_history[-1]}
+        Maksimum Value            : {self.fitness_max_history.max()}
+        Jumlah Populasi           : {population_size}
+        Jumlah Generasi (Iterasi) : {max_generation}
+        Waktu Eksekusi            : {time:.2f} seconds"""
+
+        ax2.axis("off")
+        ax2.text(0, 0.75, array_stats_text, ha="left", va="center", fontsize=12, fontdict={"family": "monospace"})
+        ax2.set_title("Statistics")
+
+        # Baris 3: Visualisasi 3D kubus
+        gs_bottom = gs[2, :].subgridspec(1, 2, width_ratios=[50, 50])
+
+        # Baris 3, Kolom 1 dan 2: Plot 3D kubus
+        initial_cube = self.max_cube_history[0].cube
+        final_cube = self.max_cube_history[-1].cube
+
+        ax3 = fig.add_subplot(gs_bottom[0, 0], projection='3d')
+        visualize_3d_cube_2(ax3, initial_cube, "Initial Cube")
+
+        ax4 = fig.add_subplot(gs_bottom[0, 1], projection='3d')
+        visualize_3d_cube_2(ax4, final_cube, "Final Cube")
+
+        plt.tight_layout()
+        plt.show()
+
+
+
+
+
+# Testing
 if __name__ == "__main__":
     ga = GeneticAlgorithm()
     # populasi
-    population = [MagicCube() for _ in range(100)]
+    jumlah_populasi = 100
+    banyak_generasi = 100
+    population = [MagicCube() for _ in range(jumlah_populasi)]
     population.sort(key=lambda x: x.fitness, reverse=True)
+    
+    # run test
+    ga.plot(*ga.run(population, jumlah_populasi, banyak_generasi))
     
     # for cube in population:
     #     print(cube.fitness)
     # total_fitness = sum([cube.fitness for cube in population])
     
-    # # roulette_wheel
+    # # roulette_wheel test
     # roulette_wheel = ga._GeneticAlgorithm__roulette_wheel(population, total_fitness)
     # for probability, cube in roulette_wheel:
     #     print(cube.fitness, probability)
     
-    # # selection
+    # # selection test
     # parent1, parent2 = ga._GeneticAlgorithm__selection(roulette_wheel)
     # print(parent1.fitness)
     # print(parent2.fitness)
 
-    # # crossover
+    # # crossover test
     # child1, child2 = ga._GeneticAlgorithm__crossover(parent1, parent2, 1)
     # print(child1.fitness)
     # print(child2.fitness)
 
-    # # mutation
+    # # mutation test
     # ga._GeneticAlgorithm__mutation(child1, 1)
     # print(child1.fitness)
     # ga._GeneticAlgorithm__mutation(child1, 2)
     # print(child1.fitness)
     # ga._GeneticAlgorithm__mutation(child1, 3)
     # print(child1.fitness)
-
-    # run
-    print(len(population))
-    ga.run(population, 100, 1000)
-    print(ga.fitness_max_history)
-    print(ga.fitness_avg_history)
-    # print(ga.max_cube_history)
-    print(ga.max_cube_history[-1].fitness)
-    print(ga.max_cube_history[-1].cube)
