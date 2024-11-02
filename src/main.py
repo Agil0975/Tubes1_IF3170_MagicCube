@@ -52,9 +52,50 @@ while True:
             visualize_3d_cube(result.cube, f"Final Cube {i+1}")
 
     elif choice == "3":
-        print("Random Restart Hill Climbing")
+
+        max_restarts = int(input("Enter the maximum number of restarts: "))
+        
+        for i in range (3):
+            cube = MagicCube()
+            print(f"Initial Objective Value: {cube.value}")
+            visualize_3d_cube(cube.cube, f"Initial Cube {i+1}")
+            
+            hill_climbing = HillClimbing()
+            start = time.time()
+            result, objective_values, iterations_per_restart = hill_climbing.randomRestart(cube, max_restarts)
+            end = time.time()
+
+            print(f"Time taken: {end - start} seconds")
+            print(f"Final Objective Value: {result.value}")
+            print(f"Number of restarts: {len(iterations_per_restart) - 1}")
+            for j in range(len(iterations_per_restart)):
+                if (j == 0):
+                    print(f'Number of iterations for first trial: {iterations_per_restart[j]}')
+                else:
+                    print(f'Number of iterations for restart {j}: {iterations_per_restart[j]}')
+            hill_climbing.plot_objective_value(objective_values, f"Objective value over iterations {i+1}")
+            visualize_3d_cube(result.cube, f"Final Cube {i+1}")
+
     elif choice == "4":
-        print("Stochastic Hill Climbing")
+
+        max_iterations = int(input("Enter the maximum number of iterations: "))
+        
+        for i in range (3):
+            cube = MagicCube()
+            print(f"Initial Objective Value: {cube.value}")
+            visualize_3d_cube(cube.cube, f"Initial Cube {i+1}")
+            
+            hill_climbing = HillClimbing()
+            start = time.time()
+            result, objective_values, number_of_iterations = hill_climbing.stochastic(cube, max_iterations)
+            end = time.time()
+
+            print(f"Time taken: {end - start} seconds")
+            print(f"Final Objective Value: {result.value}")
+            print(f"Number of iterations: {number_of_iterations + 1}")
+            hill_climbing.plot_objective_value(objective_values, f"Objective value over iterations {i+1}")
+            visualize_3d_cube(result.cube, f"Final Cube {i+1}")
+
     elif choice == "5":
         print("Simulated Annealing")
     elif choice == "6":

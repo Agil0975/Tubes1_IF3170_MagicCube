@@ -59,7 +59,7 @@ class HillClimbing:
 
         return current, objective_value
     
-    def randomRestart(self, cube: MagicCube) -> MagicCube:
+    def randomRestart(self, cube: MagicCube, max_restarts = 3) -> MagicCube:
         """
         melakukan pencarian random restart hill-climbing pada kubus magic
 
@@ -70,19 +70,21 @@ class HillClimbing:
         MagicCube: objek kubus hasil pencarian
         """
 
-        if cube.value == 0:
-            return cube
+        objective_values = []
+        iterations_per_restart = []
 
-        for i in range(max_restarts):
-            steepest_ascent_result = self.steepestAscent(cube)
+        for i in range(max_restarts + 1):
+            steepest_ascent_result, objective_values_per_restart = self.steepestAscent(cube)
+            objective_values.extend(objective_values_per_restart)
+            iterations_per_restart.append(len(objective_values_per_restart))
             
             if steepest_ascent_result.value == 0:
-                return steepest_ascent_result
+                return steepest_ascent_result, objective_values
             
-            if i < max_restarts - 1:
-                cube = MagicCube.MagicCube()
+            if i < max_restarts:
+                cube = MagicCube()
 
-        return steepest_ascent_result     
+        return steepest_ascent_result, objective_values, iterations_per_restart
     
     def stochastic(self, cube: MagicCube, max_iterations: int) -> MagicCube:
         """
@@ -95,18 +97,20 @@ class HillClimbing:
         MagicCube: objek kubus hasil pencarian
         """
 
-        if cube.value == 0:
-            return cube
+        objective_values = []
+        objective_values.append(cube.value)
 
         for i in range(max_iterations):
             neighbor = cube.randomSuccessor()
             if neighbor.value > cube.value:
                 cube = neighbor
             
+            objective_values.append(cube.value)
+            
             if cube.value == 0:
-                return cube
+                return cube, objective_values, i
         
-        return cube
+        return cube, objective_values, i
     
     def plot_objective_value(self, objective_value: list, message: str) -> None:
         """
