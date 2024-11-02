@@ -1,7 +1,6 @@
-import numpy as np
 import matplotlib.pyplot as plt
 
-def visualize_3d_cube(magic_cube):
+def visualize_3d_cube(magic_cube, message: str) -> None:
     """
     Membuat visualisasi 3D dari magic cube 5x5x5
     
@@ -33,7 +32,7 @@ def visualize_3d_cube(magic_cube):
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
-    ax.set_title('5x5x5 Cube Visualization')
+    ax.set_title(message)
     
     # Set axis limits
     ax.set_xlim([0, 5])
@@ -49,7 +48,3 @@ def visualize_3d_cube(magic_cube):
     # Adjust layout
     plt.tight_layout()
     plt.show()
-
-# # Twesting
-# sample_data = np.random.randint(1, 126, size=(5, 5, 5))
-# visualize_3d_cube(sample_data)
