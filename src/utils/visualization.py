@@ -50,6 +50,6 @@ def visualize_3d_cube(magic_cube):
     plt.tight_layout()
     plt.show()
 
-# Twesting
-sample_data = np.random.randint(1, 126, size=(5, 5, 5))
-visualize_3d_cube(sample_data)
+# # Twesting
+# sample_data = np.random.randint(1, 126, size=(5, 5, 5))
+# visualize_3d_cube(sample_data)

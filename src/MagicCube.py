@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from utils.visualization import visualize_3d_cube
 
 class MagicCube:
     def __init__(self) -> None:
@@ -183,6 +184,7 @@ if __name__ == "__main__":
     cube = MagicCube()
     print(cube.cube[0, 0, 0])
     print(cube.cube)
+    visualize_3d_cube(cube.cube)
     cube.cube[0, 0, 0] = 1
     print(cube.cube[0, 0, 0])
     print(cube.cube)
