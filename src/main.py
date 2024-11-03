@@ -1,7 +1,7 @@
 from MagicCube import MagicCube 
 from HillClimbing import HillClimbing
 from GeneticAlgorithm import GeneticAlgorithm
-from utils.visualization import plot
+from Visualization import Visualization
 import time
 
 if __name__ == "__main__":
@@ -33,7 +33,7 @@ if __name__ == "__main__":
             Time Execution       : {time_execution:.2f} seconds
             """
 
-            plot(objective_value, array_stats_text, cube, result)
+            Visualization.plot(objective_value, array_stats_text, cube, result)
 
         elif choice == "2": # Sideways Move Hill Climbing
             max_iterations = int(input("Enter the maximum number of sideways moves: "))
@@ -53,7 +53,7 @@ if __name__ == "__main__":
             Time Execution       : {time_execution:.2f} seconds
             """
 
-            plot(objective_value, array_stats_text, cube, result)
+            Visualization.plot(objective_value, array_stats_text, cube, result)
 
         elif choice == "3": # Random Restart Hill Climbing
             max_restarts = int(input("Enter the maximum number of restarts: "))
@@ -76,7 +76,7 @@ if __name__ == "__main__":
             for i in range(1, restart+1):
                 array_stats_text += f"\nRestart {i} : {iterations_per_restart[i]} iterations"
 
-            plot(objective_values, array_stats_text, cube, result)
+            Visualization.plot(objective_values, array_stats_text, cube, result)
 
         elif choice == "4": # Stochastic Hill Climbing
             max_iterations = int(input("Enter the maximum number of iterations: "))
@@ -95,7 +95,7 @@ if __name__ == "__main__":
             Time Execution       : {time_execution:.2f} seconds
             """
 
-            plot(objective_values, array_stats_text, cube, result)
+            Visualization.plot(objective_values, array_stats_text, cube, result)
 
         elif choice == "5": # Simulated Annealing
             print("Simulated Annealing")
@@ -124,7 +124,7 @@ if __name__ == "__main__":
             Waktu Eksekusi            : {time_execution:.2f} seconds
             """
 
-            plot(ga.value_max_history,
+            Visualization.plot(ga.value_max_history,
                  array_stats_text,
                  max_initial_cube,
                  max_final_cube,
