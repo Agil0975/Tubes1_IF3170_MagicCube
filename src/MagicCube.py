@@ -75,7 +75,7 @@ class MagicCube:
         
         return -count_mismatch 
     
-    def value2point0(self) -> int:
+    def sumOfError(self) -> int:
         """
         mengembalikan nilai objektif dari kubus
         value = -(banyaknya baris, kolom, tiang, dan diagonal yang belum berjumlah 315)

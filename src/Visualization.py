@@ -56,7 +56,7 @@ class Visualization:
             plt.show()
 
     @staticmethod
-    def visualize_3d_cube(ax: plt.Axes3D, magic_cube: MagicCube, message: str) -> None:
+    def visualize_3d_cube(ax: plt.Axes, magic_cube: MagicCube, message: str) -> None:
         """
         Create 3D visualization of a magic cube 5x5x5
 
