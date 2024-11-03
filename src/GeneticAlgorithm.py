@@ -1,8 +1,4 @@
 from MagicCube import MagicCube
-from utils.visualization import visualize_3d_cube_2
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 import numpy as np
 import random
 import time
@@ -14,7 +10,8 @@ class GeneticAlgorithm:
         """
         self.fitness_max_history = np.array([])
         self.fitness_avg_history = np.array([])
-        self.max_cube_history = np.array([])
+        self.max_initial_cube = None
+        self.max_final_cube = None
 
     def __update_history(self, population: list) -> int:
         """
@@ -29,7 +26,6 @@ class GeneticAlgorithm:
         total_fitness = sum([cube.fitness for cube in population])
         self.fitness_avg_history = np.append(self.fitness_avg_history, total_fitness / len(population))
         self.fitness_max_history = np.append(self.fitness_max_history, population[0].fitness)
-        self.max_cube_history = np.append(self.max_cube_history, population[0])
 
         return total_fitness
 
@@ -273,8 +269,9 @@ class GeneticAlgorithm:
         generation = 0
         patient = 0 # jumlah generasi tanpa perubahan fitness terbaik
         total_fitness = self.__update_history(current_generation)
+        self.max_initial_cube = current_generation[0]
 
-        max_stuck = 0.1 * max_generation if max_generation >= 1000 else 0.2 * max_generation
+        max_stuck = 0.1 * max_generation
         batas_mutasi_rendah = 0.05 if population_size >= 100 else 0.01
         batas_mutasi_tinggi = 0.1 if population_size >= 100 else 0.05
         batas_elitisme = 0.05
@@ -290,7 +287,6 @@ class GeneticAlgorithm:
             
             # Elitisme
             if patient < max_stuck:
-                # ambil individu terbaik dari generasi sebelumnya
                 next_generation.extend(current_generation[:int(batas_elitisme * population_size)])
                 
             # Seleksi dan Crossover
@@ -323,59 +319,8 @@ class GeneticAlgorithm:
             generation += 1
         end = time.time()
 
-        return end - start, population_size, generation
-
-    def plot(self, time: float, population_size: int, max_generation: int) -> None:
-        """
-        Membuat plot hasil algoritma genetika
-
-        Args:
-            time (float): waktu eksekusi algoritma
-            population_size (int): ukuran populasi
-            max_generation (int): maksimum generasi
-        """
-        # Membuat figure dengan gridspec dan mengatur rasio
-        fig = plt.figure(figsize=(15, 12))
-        gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[70, 30])
-
-        # Baris 1, Kolom 1: Grafik garis avg dan max fitness
-        ax1 = fig.add_subplot(gs[0, 0])
-        ax1.plot(self.fitness_avg_history, label="Average Fitness", color="blue")
-        ax1.plot(self.fitness_max_history, label="Max Fitness", color="red")
-        ax1.set_title("Line Plot of Two Arrays")
-        ax1.set_xlabel("Generasi")
-        ax1.set_ylabel("Value")
-        ax1.legend()
-
-        # Baris 1, Kolom 2: Statistik algoritma genetika
-        ax2 = fig.add_subplot(gs[0, 1])
-        array_stats_text = f"""
-        Initial Maksimum Value    : {self.fitness_max_history[0]}
-        Final Maksimum Value      : {self.fitness_max_history[-1]}
-        Maksimum Value            : {self.fitness_max_history.max()}
-        Jumlah Populasi           : {population_size}
-        Jumlah Generasi (Iterasi) : {max_generation}
-        Waktu Eksekusi            : {time:.2f} seconds"""
-
-        ax2.axis("off")
-        ax2.text(0, 0.75, array_stats_text, ha="left", va="center", fontsize=12, fontdict={"family": "monospace"})
-        ax2.set_title("Statistics")
-
-        # Baris 3: Visualisasi 3D kubus
-        gs_bottom = gs[2, :].subgridspec(1, 2, width_ratios=[50, 50])
-
-        # Baris 3, Kolom 1 dan 2: Plot 3D kubus
-        initial_cube = self.max_cube_history[0].cube
-        final_cube = self.max_cube_history[-1].cube
-
-        ax3 = fig.add_subplot(gs_bottom[0, 0], projection='3d')
-        visualize_3d_cube_2(ax3, initial_cube, "Initial Cube")
-
-        ax4 = fig.add_subplot(gs_bottom[0, 1], projection='3d')
-        visualize_3d_cube_2(ax4, final_cube, "Final Cube")
-
-        plt.tight_layout()
-        plt.show()
+        self.max_final_cube = current_generation[0]
+        return end - start, generation
 
 
 
@@ -389,9 +334,6 @@ if __name__ == "__main__":
     banyak_generasi = 100
     population = [MagicCube() for _ in range(jumlah_populasi)]
     population.sort(key=lambda x: x.fitness, reverse=True)
-    
-    # run test
-    ga.plot(*ga.run(population, jumlah_populasi, banyak_generasi))
     
     # for cube in population:
     #     print(cube.fitness)

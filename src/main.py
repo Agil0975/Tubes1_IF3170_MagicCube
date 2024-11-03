@@ -1,12 +1,11 @@
 from MagicCube import MagicCube 
 from HillClimbing import HillClimbing
 from GeneticAlgorithm import GeneticAlgorithm
-from utils.visualization import visualize_3d_cube
+from utils.visualization import plot
 import time
 
 if __name__ == "__main__":
     while True:
-
         print("Choose one of the following algorithms:")
         print("1. Steepest Ascent Hill Climbing")
         print("2. Sideways Move Hill Climbing")
@@ -20,77 +19,83 @@ if __name__ == "__main__":
 
         if choice == "1": # Steepest Ascent Hill Climbing
             cube = MagicCube()
-            print(f'Initial Objective Value: {cube.value}')
-            visualize_3d_cube(cube.cube, f"Initial Cube")
             hill_climbing = HillClimbing()
 
             start = time.time()
             result, objective_value = hill_climbing.steepestAscent(cube)
             end = time.time()
+            time_execution = end - start
             
-            print(f'Time taken: {end - start} seconds')
-            print(f'Final Objective Value: {result.value}')
-            hill_climbing.plot_objective_value(objective_value, f"Objective Value")
-            visualize_3d_cube(result.cube, f"Final Cube")
+            array_stats_text = f"""
+            Initial Value        : {cube.value}
+            Final Value          : {result.value}
+            Number of Iterations : {len(objective_value) - 1}
+            Time Execution       : {time_execution:.2f} seconds
+            """
+
+            plot(objective_value, array_stats_text, cube, result)
 
         elif choice == "2": # Sideways Move Hill Climbing
             max_iterations = int(input("Enter the maximum number of sideways moves: "))
 
             cube = MagicCube()
-            print(f'Initial Objective Value: {cube.value}')
-            visualize_3d_cube(cube.cube, f"Initial Cube")
             hill_climbing = HillClimbing()
 
             start = time.time()
             result, objective_value = hill_climbing.sidewaysMove(cube, max_iterations)
             end = time.time()
+            time_execution = end - start
 
-            print(f'Time taken: {end - start} seconds')
-            print(f'Number of iterations: {len(objective_value)}')
-            print(f'Final Objective Value: {result.value}')
-            hill_climbing.plot_objective_value(objective_value, f"Objective Value")
-            visualize_3d_cube(result.cube, f"Final Cube")
+            array_stats_text = f"""
+            Initial Value        : {cube.value}
+            Final Value          : {result.value}
+            Number of Iterations : {len(objective_value) - 1}
+            Time Execution       : {time_execution:.2f} seconds
+            """
+
+            plot(objective_value, array_stats_text, cube, result)
 
         elif choice == "3": # Random Restart Hill Climbing
             max_restarts = int(input("Enter the maximum number of restarts: "))
-    
             cube = MagicCube()
-            print(f"Initial Objective Value: {cube.value}")
-            visualize_3d_cube(cube.cube, f"Initial Cube")
-                
             hill_climbing = HillClimbing()
+            
             start = time.time()
-            result, objective_values, iterations_per_restart = hill_climbing.randomRestart(cube, max_restarts)
+            result, objective_values, iterations_per_restart, restart = hill_climbing.randomRestart(cube, max_restarts)
             end = time.time()
+            time_execution = end - start
+            
+            array_stats_text = f"""
+            Initial Value        : {cube.value}
+            Final Value          : {result.value}
+            Time Execution       : {time_execution:.2f} seconds
+            Number of Restarts   : {restart}
+            First Try            : {iterations_per_restart[0]} iterations
+            """
 
-            print(f"Time taken: {end - start} seconds")
-            print(f"Final Objective Value: {result.value}")
-            print(f"Number of restarts: {len(iterations_per_restart) - 1}")
-            for j in range(len(iterations_per_restart)):
-                if (j == 0):
-                    print(f'Number of iterations for first trial: {iterations_per_restart[j]}')
-                else:
-                    print(f'Number of iterations for restart {j}: {iterations_per_restart[j]}')
-            hill_climbing.plot_objective_value(objective_values, f"Objective Value")
-            visualize_3d_cube(result.cube, f"Final Cube")
+            for i in range(1, restart+1):
+                array_stats_text += f"\nRestart {i} : {iterations_per_restart[i]} iterations"
+
+            plot(objective_values, array_stats_text, cube, result)
 
         elif choice == "4": # Stochastic Hill Climbing
             max_iterations = int(input("Enter the maximum number of iterations: "))
-            
-            cube = MagicCube()
-            print(f"Initial Objective Value: {cube.value}")
-            visualize_3d_cube(cube.cube, f"Initial Cube")
-                
+            cube = MagicCube()                
             hill_climbing = HillClimbing()
+            
             start = time.time()
             result, objective_values, number_of_iterations = hill_climbing.stochastic(cube, max_iterations)
             end = time.time()
+            time_execution = end - start
 
-            print(f"Time taken: {end - start} seconds")
-            print(f"Final Objective Value: {result.value}")
-            print(f"Number of iterations: {number_of_iterations + 1}")
-            hill_climbing.plot_objective_value(objective_values, f"Objective Value")
-            visualize_3d_cube(result.cube, f"Final Cube")
+            array_stats_text = f"""
+            Initial Value        : {cube.value}
+            Final Value          : {result.value}
+            Number of Iterations : {number_of_iterations+1}
+            Time Execution       : {time_execution:.2f} seconds
+            """
+
+            plot(objective_values, array_stats_text, cube, result)
 
         elif choice == "5": # Simulated Annealing
             print("Simulated Annealing")
@@ -105,12 +110,31 @@ if __name__ == "__main__":
             population.sort(key=lambda x: x.fitness, reverse=True)
 
             # Perform genetic algorithm
-            ga.plot(*ga.run(population, max_population, max_iterations))
+            time_execution, generation = ga.run(population, max_population, max_iterations)
 
+            # plot the result
+            max_initial_cube = ga.max_initial_cube
+            max_final_cube = ga.max_final_cube
+            array_stats_text = f"""
+            Initial Maksimum Value    : {ga.fitness_max_history[0]}
+            Final Maksimum Value      : {ga.fitness_max_history[-1]}
+            Maksimum Value Achieved   : {ga.fitness_max_history.max()}
+            Jumlah Populasi           : {max_population}
+            Jumlah Generasi (Iterasi) : {generation}
+            Waktu Eksekusi            : {time_execution:.2f} seconds
+            """
+
+            plot(ga.fitness_max_history,
+                 array_stats_text,
+                 max_initial_cube,
+                 max_final_cube,
+                 ga.fitness_avg_history
+                 )
+            
         elif choice == "7":
             print("Exit")
             break
-        
+
         else:
             print("Invalid input. Please try again.")
             continue
