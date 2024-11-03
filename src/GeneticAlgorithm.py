@@ -47,7 +47,7 @@ class GeneticAlgorithm:
 
         return roulette_wheel
 
-    def __selection(self, roulette_wheel: list) -> list:
+    def __selection(self, roulette_wheel: list) -> tuple[MagicCube, MagicCube]:
         """
         Seleksi dua individu dari roulette wheel
 
@@ -55,7 +55,7 @@ class GeneticAlgorithm:
             roulette_wheel (list): list roulette wheel
 
         Returns:
-            list: dua individu terpilih
+            tuple[MagicCube, MagicCube]: dua individu yang terpilih
         """
         parent1 = parent2 = None
 
@@ -71,7 +71,7 @@ class GeneticAlgorithm:
 
         return parent1, parent2
         
-    def __crossover(self, parent1: MagicCube, parent2: MagicCube, type: int) -> list:
+    def __crossover(self, parent1: MagicCube, parent2: MagicCube, type: int) -> tuple[MagicCube, MagicCube]:
         """
         Crossover dua individu
 
@@ -83,7 +83,7 @@ class GeneticAlgorithm:
                         2: bidang-xz
                         3: bidang-yz
         Returns:
-            list: dua individu hasil crossover
+            tuple[MagicCube, MagicCube]: dua individu hasil crossover
         """
         # Pilih dua titik potong secara acak
         cut = np.random.randint(1,4)
@@ -248,7 +248,7 @@ class GeneticAlgorithm:
             population: list, 
             population_size: int,
             max_generation: int
-            ) -> tuple:
+            ) -> tuple[float, int]:
         """
         Menjalankan algoritma genetika
 
@@ -258,7 +258,7 @@ class GeneticAlgorithm:
             max_generation (int): maksimum generasi
             
         Returns:
-            tuple: waktu eksekusi, ukuran populasi, jumlah generasi
+            tuple: waktu eksekusi, generasi terakhir
         """
         current_generation = population
         generation = 0

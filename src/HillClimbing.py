@@ -2,7 +2,7 @@ from MagicCube import MagicCube
 
 class HillClimbing:
 
-    def steepestAscent(self, cube: MagicCube) -> MagicCube:
+    def steepestAscent(self, cube: MagicCube) -> tuple[MagicCube, list]:
         """
         melakukan pencarian steepest ascent hill-climbing pada kubus magic
 
@@ -10,7 +10,7 @@ class HillClimbing:
             cube (MagicCube): objek kubus magic
 
         return:
-        MagicCube: objek kubus hasil pencarian
+        tuple[MagicCube, list]: objek kubus hasil pencarian dan list nilai objektif
         """
         current = cube
         objective_value = [current.value] # List of objective value of the cube
@@ -25,8 +25,7 @@ class HillClimbing:
 
         return current, objective_value
     
-    
-    def sidewaysMove(self, cube: MagicCube, max_iterations = 3) -> MagicCube:
+    def sidewaysMove(self, cube: MagicCube, max_iterations: int = 3) -> tuple[MagicCube, list]:
         """
         melakukan pencarian sideways move hill-climbing pada kubus magic
 
@@ -35,7 +34,7 @@ class HillClimbing:
             max_iterations (int): maksimum sideways move
 
         return:
-        MagicCube: objek kubus hasil pencarian
+        tuple[MagicCube, list]: objek kubus hasil pencarian dan list nilai objektif
         """
         current = cube
         value_count = {} # the count of the side way move
@@ -61,7 +60,7 @@ class HillClimbing:
 
         return current, objective_value
     
-    def randomRestart(self, cube: MagicCube, max_restarts = 3) -> MagicCube:
+    def randomRestart(self, cube: MagicCube, max_restarts: int = 3) -> tuple[MagicCube, list, list, int]:
         """
         melakukan pencarian random restart hill-climbing pada kubus magic
 
@@ -70,7 +69,7 @@ class HillClimbing:
             max_restarts (int): maksimum restart
 
         return:
-        MagicCube: objek kubus hasil pencarian
+        tuple[MagicCube, list, list, int]: objek kubus hasil pencarian, list nilai objektif, list iterasi per restart, dan jumlah restart
         """
 
         objective_values = []
@@ -90,7 +89,7 @@ class HillClimbing:
 
         return steepest_ascent_result, objective_values, iterations_per_restart, i
     
-    def stochastic(self, cube: MagicCube, max_iterations: int) -> MagicCube:
+    def stochastic(self, cube: MagicCube, max_iterations: int) -> tuple[MagicCube, list, int]:
         """
         melakukan pencarian stochastic hill-climbing pada kubus magic
 
@@ -99,7 +98,7 @@ class HillClimbing:
             max_iterations (int): maksimum iterasi
 
         return:
-        MagicCube: objek kubus hasil pencarian
+        tuple[MagicCube, list, int]: objek kubus hasil pencarian, list nilai objektif, dan jumlah iterasi
         """
         objective_values = []
         objective_values.append(cube.value)

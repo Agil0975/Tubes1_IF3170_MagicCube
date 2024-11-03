@@ -136,12 +136,12 @@ class MagicCube:
         self.cube = cube.reshape(5,5,5)
         self.refresh()
 
-    def highestSuccessor(self) -> None:
+    def highestSuccessor(self) -> 'MagicCube':
         """
         mengembalikan succussor dengan objective value tertinggi
 
         return:
-        Cube: objek kubus successor
+        MagicCube: objek kubus successor
         """
         max_value = -109
         max_cube = None
@@ -160,12 +160,12 @@ class MagicCube:
                                     max_cube = new_cube
         return max_cube
 
-    def randomSuccessor(self) -> None:
+    def randomSuccessor(self) -> 'MagicCube':
         """
         mengembalikan succussor secara random
 
         return:
-        Cube: objek kubus successor
+        MagicCube: objek kubus successor
         """
         first_elmt = tuple(np.random.randint(5, size=3))
         second_elmt = tuple(np.random.randint(5, size=3))
@@ -177,37 +177,3 @@ class MagicCube:
         new_cube.swap(first_elmt, second_elmt)
 
         return new_cube
-
-# Testing
-if __name__ == "__main__":
-    cube = MagicCube()
-
-    print(cube.cube[0, 0, 0])
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)
-
-    high = cube.highestSuccessor()
-    # print(high.cube)
-    print(high.value)
-    print(high.fitness)
-    
-    random = cube.randomSuccessor()
-    # print(random.cube)
-    print(random.value)
-    print(random.fitness)
-
-    cube.swap((0, 0, 0), (0, 0, 1))
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)
-
-    cube.scramble(0, 10)
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)
-
-    cube.inverse(0, 10)
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)
