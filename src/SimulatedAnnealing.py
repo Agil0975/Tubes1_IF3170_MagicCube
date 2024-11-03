@@ -1,14 +1,16 @@
 from MagicCube import MagicCube
 import random
+import time
 
 class SimulatedAnnealing:
     def __init__(self):
         """
         Constructor kelas SimulatedAnnealing
         """
-        self.temperature = 10
-        self.alpha = 0.9999
-        self.min_temperature = 0.0001
+        self.temperature = 4
+        self.alpha = 0.99999
+        self.min_temperature = 0.0009
+        self.iteration = 0
 
     def getTemperature(self) -> float:
         """
@@ -30,42 +32,35 @@ class SimulatedAnnealing:
 
     def simulatedAnnealing(self, current: MagicCube) -> MagicCube:
         random_successor = MagicCube()
-        # print(random_successor.cube)
-        """
-        melakukan pencarian simulated annealing pada kubus magic
-
-        Args:
-            cube (MagicCube): objek kubus magic
-
-        return:
-        MagicCube: objek kubus hasil pencarian
-        """
+        x = 0
         no_improvement_steps = 0
+        sameRes = 0
+        start_Line = False
+        lastScore = 0
+
         while self.getTemperature() > self.min_temperature:
             random_successor = current.randomSuccessor()
             delta = random_successor.value - current.value
 
             if delta >= 0:
                 current = random_successor
+                lastScore = current.value2point0()
                 if delta == 0:
-                    no_improvement_steps += 1
+                    no_improvement_steps += 0
                 else :
                     no_improvement_steps = 0
             else:
                 probability = 2.71828 ** (delta / self.getTemperature())
-                if random.random() < probability:
+                if probability > 0.8:
+                    lastScore = current.value2point0()
                     current = random_successor
                     no_improvement_steps = 0  # Reset counter on acceptance
                 else:
                     no_improvement_steps += 1
 
-            # Adaptive cooling: if no improvement for a while, cool faster
-            if no_improvement_steps > 10 and self.getTemperature() > 1:
-                self.setTemperature(self.getTemperature() * self.alpha * 0.99)
-                print("Cooling faster")
-            else:
-                self.setTemperature(self.getTemperature() * self.alpha)
+            self.setTemperature(self.getTemperature() * self.alpha)
                 
+            self.iteration += 1    
 
             # self.temperature *= self.alpha
 
@@ -74,10 +69,5 @@ class SimulatedAnnealing:
 
 
         return current
-    
-# Testing
-sim_anneal = SimulatedAnnealing()
-cube = MagicCube()
-cube = sim_anneal.simulatedAnnealing(cube)
-print(cube.value)
+
     

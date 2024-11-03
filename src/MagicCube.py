@@ -74,6 +74,42 @@ class MagicCube:
             count_mismatch += 1
         
         return -count_mismatch 
+    
+    def value2point0(self) -> int:
+        """
+        mengembalikan nilai objektif dari kubus
+        value = -(banyaknya baris, kolom, tiang, dan diagonal yang belum berjumlah 315)
+        range value = (-109, 0)
+        
+        return:
+        int: nilai objektif kubus
+        """
+        target = 315
+        sum = 0
+
+        # Mengecek baris, kolom, dan tiang
+        for i in range(5):
+            for j in range(5):
+                sum += abs(np.sum(self[i, j, :]) - target) # Baris
+                sum += abs(np.sum(self[i, :, j]) - target)  # Kolom
+                sum += abs(np.sum(self[:, i, j]) - target)  # Tiang
+
+        # Mengecek diagonal pada setiap potongan bidang
+        for i in range(5):
+            sum += abs(np.sum(np.diagonal(self[i, :, :])) - target)  # Diagonal bidang xy
+            sum += abs(np.sum(np.diagonal(self[:, i, :])) - target)  # Diagonal bidang xz
+            sum += abs(np.sum(np.diagonal(self[:, :, i])) - target)  # Diagonal bidang yz
+            sum += abs(np.sum(np.diagonal(np.fliplr(self[i, :, :]))) - target)  # Diagonal bidang xy (berlawanan)
+            sum += abs(np.sum(np.diagonal(np.fliplr(self[:, i, :]))) - target)  # Diagonal bidang xz (berlawanan)
+            sum += abs(np.sum(np.diagonal(np.fliplr(self[:, :, i]))) - target)  # Diagonal bidang yz (berlawanan)
+
+        # Mengecek diagonal pada kubus
+        sum += abs(np.sum([self[i, i, i] for i in range(5)]) - target)  # Diagonal ruang 1
+        sum += abs(np.sum([self[i, i, 4 - i] for i in range(5)]) - target)  # Diagonal ruang 2
+        sum += abs(np.sum([self[i, 4 - i, i] for i in range(5)]) - target)  # Diagonal ruang 3
+        sum += abs(np.sum([self[4 - i, i, i] for i in range(5)]) - target)  # Diagonal ruang 4
+        
+        return -sum
 
     def __fitness(self) -> int:
         """
