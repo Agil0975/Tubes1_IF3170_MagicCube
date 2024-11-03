@@ -116,19 +116,19 @@ if __name__ == "__main__":
             max_initial_cube = ga.max_initial_cube
             max_final_cube = ga.max_final_cube
             array_stats_text = f"""
-            Initial Maksimum Value    : {ga.fitness_max_history[0]}
-            Final Maksimum Value      : {ga.fitness_max_history[-1]}
-            Maksimum Value Achieved   : {ga.fitness_max_history.max()}
+            Initial Maksimum Value    : {ga.value_max_history[0]}
+            Final Maksimum Value      : {ga.value_max_history[-1]}
+            Maksimum Value Achieved   : {ga.value_max_history.max()}
             Jumlah Populasi           : {max_population}
             Jumlah Generasi (Iterasi) : {generation}
             Waktu Eksekusi            : {time_execution:.2f} seconds
             """
 
-            plot(ga.fitness_max_history,
+            plot(ga.value_max_history,
                  array_stats_text,
                  max_initial_cube,
                  max_final_cube,
-                 ga.fitness_avg_history
+                 ga.value_avg_history
                  )
             
         elif choice == "7":

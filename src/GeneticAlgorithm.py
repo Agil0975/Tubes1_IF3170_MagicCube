@@ -8,26 +8,21 @@ class GeneticAlgorithm:
         """
         Constructor kelas GeneticAlgorithm
         """
-        self.fitness_max_history = np.array([])
-        self.fitness_avg_history = np.array([])
+        self.value_max_history = np.array([])
+        self.value_avg_history = np.array([])
         self.max_initial_cube = None
         self.max_final_cube = None
 
-    def __update_history(self, population: list) -> int:
+    def __update_history(self, population: list) -> None:
         """
-        Memperbarui histori fitness maksimum dan rata-rata
+        Memperbarui histori objective value maksimum dan rata-rata
 
         Args:
             population (list): populasi saat ini
-
-        Returns:
-            int: total fitness dari populasi
         """
-        total_fitness = sum([cube.fitness for cube in population])
-        self.fitness_avg_history = np.append(self.fitness_avg_history, total_fitness / len(population))
-        self.fitness_max_history = np.append(self.fitness_max_history, population[0].fitness)
-
-        return total_fitness
+        total_value = sum([cube.value for cube in population])
+        self.value_avg_history = np.append(self.value_avg_history, total_value / len(population))
+        self.value_max_history = np.append(self.value_max_history, population[0].value)
 
     def __roulette_wheel(self, population: list, fitness_sum: int) -> list:
         """
@@ -268,7 +263,8 @@ class GeneticAlgorithm:
         current_generation = population
         generation = 0
         patient = 0 # jumlah generasi tanpa perubahan fitness terbaik
-        total_fitness = self.__update_history(current_generation)
+        total_fitness = sum([cube.fitness for cube in current_generation])
+        self.__update_history(current_generation)
         self.max_initial_cube = current_generation[0]
 
         max_stuck = 0.1 * max_generation
@@ -308,10 +304,11 @@ class GeneticAlgorithm:
             # Update generasi
             current_generation = next_generation
             current_generation.sort(key=lambda x: x.fitness, reverse=True)
-            total_fitness = self.__update_history(current_generation)
+            total_fitness = sum([cube.fitness for cube in current_generation])
+            self.__update_history(current_generation)
 
             # Update patient
-            if self.fitness_max_history[-1] == self.fitness_max_history[-2]:
+            if self.value_max_history[-1] == self.value_max_history[-2]:
                 patient += 1
             else:
                 patient = 0
@@ -321,43 +318,3 @@ class GeneticAlgorithm:
 
         self.max_final_cube = current_generation[0]
         return end - start, generation
-
-
-
-
-
-# Testing
-if __name__ == "__main__":
-    ga = GeneticAlgorithm()
-    # populasi
-    jumlah_populasi = 100
-    banyak_generasi = 100
-    population = [MagicCube() for _ in range(jumlah_populasi)]
-    population.sort(key=lambda x: x.fitness, reverse=True)
-    
-    # for cube in population:
-    #     print(cube.fitness)
-    # total_fitness = sum([cube.fitness for cube in population])
-    
-    # # roulette_wheel test
-    # roulette_wheel = ga._GeneticAlgorithm__roulette_wheel(population, total_fitness)
-    # for probability, cube in roulette_wheel:
-    #     print(cube.fitness, probability)
-    
-    # # selection test
-    # parent1, parent2 = ga._GeneticAlgorithm__selection(roulette_wheel)
-    # print(parent1.fitness)
-    # print(parent2.fitness)
-
-    # # crossover test
-    # child1, child2 = ga._GeneticAlgorithm__crossover(parent1, parent2, 1)
-    # print(child1.fitness)
-    # print(child2.fitness)
-
-    # # mutation test
-    # ga._GeneticAlgorithm__mutation(child1, 1)
-    # print(child1.fitness)
-    # ga._GeneticAlgorithm__mutation(child1, 2)
-    # print(child1.fitness)
-    # ga._GeneticAlgorithm__mutation(child1, 3)
-    # print(child1.fitness)
