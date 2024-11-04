@@ -42,6 +42,7 @@ class SimulatedAnnealing:
         self.curretValue.append(current.value)
         
         while self.getTemperature() > self.min_temperature:
+            print(self.iteration, current.value)
             random_successor = current.randomSuccessor()
             delta = random_successor.value - current.value
 

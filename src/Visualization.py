@@ -24,7 +24,7 @@ class Visualization:
                 gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[70, 30])
                 print("Euler Value is None")
             else:
-                gs = fig.add_gridspec(3, 2, height_ratios=[35, 25, 40], width_ratios=[50, 50])
+                gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[50, 50])
 
             # Baris 1, Kolom 1: Grafik garis nilai objektif
             ax1 = fig.add_subplot(gs[0, 0], zorder=3)
@@ -40,8 +40,7 @@ class Visualization:
 
             if euler_value is not None:
                 axEuler = fig.add_subplot(gs[0,1], zorder=3)
-                axEuler.plot(euler_value, 'o', linestyle='None', markersize=1, label="Euler Probability")
-                axEuler.axhline(y=0.3, color='r', linestyle='--', label="Batas Bawah")
+                axEuler.plot(euler_value, 'o', linestyle='None', markersize=1)
                 axEuler.set_title("Euler Value")
                 axEuler.set_xlabel("Iteration")
                 axEuler.set_ylabel("Euler Value")
