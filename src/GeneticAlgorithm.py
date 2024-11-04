@@ -178,7 +178,7 @@ class GeneticAlgorithm:
         self.__update_history(current_generation)
         self.max_initial_cube = current_generation[0]
 
-        max_stuck = 0.1 * max_generation
+        max_stuck = 0.05 * max_generation
         batas_mutasi_rendah = 0.05 if population_size >= 100 else 0.01
         batas_mutasi_tinggi = 0.1 if population_size >= 100 else 0.05
         batas_elitisme = 0.05
