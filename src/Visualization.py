@@ -22,14 +22,15 @@ class Visualization:
             fig = plt.figure(figsize=(15, 12))
             if euler_value is None:
                 gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[70, 30])
+                print("Euler Value is None")
             else:
-                gs = fig.add_gridspec(3, 2, height_ratios=[35, 2, 40], width_ratios=[50, 50])
+                gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[50, 50])
 
             # Baris 1, Kolom 1: Grafik garis nilai objektif
-            ax1 = fig.add_subplot(gs[0, 0])
+            ax1 = fig.add_subplot(gs[0, 0], zorder=3)
             if avg_objective_value is not None:
-                ax1.plot(objective_value, label="Max Fitness Value")
-                ax1.plot(avg_objective_value, label="Average Fitness Value")
+                ax1.plot(objective_value, label="Max Objective Value")
+                ax1.plot(avg_objective_value, label="Average Objective Value")
             else:
                 ax1.plot(objective_value, label="")
             ax1.set_title("Objective Value")
@@ -38,25 +39,25 @@ class Visualization:
             ax1.legend()
 
             if euler_value is not None:
-                axEuler = fig.add_subplot(gs[0,1])
-                axEuler.plot(euler_value, label="Euler Value")
+                axEuler = fig.add_subplot(gs[0,1], zorder=3)
+                axEuler.plot(euler_value, 'o', linestyle='None', markersize=1, label="Euler Probability")
+                axEuler.axhline(y=0.3, color='r', linestyle='--', label="Batas Bawah")
                 axEuler.set_title("Euler Value")
                 axEuler.set_xlabel("Iteration")
                 axEuler.set_ylabel("Euler Value")
                 axEuler.legend()
 
-
             # Baris 1, Kolom 2: Statistik algoritma genetika
+            array_stats_text = message
             if euler_value is None:
                 ax2 = fig.add_subplot(gs[0, 1])
-            else :
-                ax2 = fig.add_subplot(gs[1, 0])
-            array_stats_text = message
-
-            ax2.axis("off")
-            ax2.text(0, 0.75, array_stats_text, ha="left", va="center", fontsize=12, fontdict={"family": "monospace"})
-            ax2.set_title("Statistics")
-
+                ax2.axis("off")
+                ax2.text(-0.5, 0.75, array_stats_text, ha="left", va="center", fontsize=10, fontdict={"family": "monospace"})
+            else:
+                ax2 = fig.add_subplot(gs[1, 0], zorder=2)
+                ax2.axis("off")
+                ax2.text(0, -1, array_stats_text, ha="left", va="center", fontsize=10, fontdict={"family": "monospace"})
+            
             # Baris 3: Visualisasi 3D kubus
             gs_bottom = gs[2, :].subgridspec(1, 2, width_ratios=[50, 50])
 
@@ -68,7 +69,7 @@ class Visualization:
             Visualization.visualize_3d_cube(ax4, final_cube, "Final Cube")
 
             plt.tight_layout()
-            plt.subplots_adjust(hspace=0.45, wspace=0.3)
+            plt.subplots_adjust(hspace=0, wspace=0.2)
             plt.show()
 
     @staticmethod
@@ -99,7 +100,7 @@ class Visualization:
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
-        ax.set_title(message)
+        ax.text(2, 2, 6, message, color='black', fontsize=12, ha='center')
 
         # Set axis limits
         ax.set_xlim([0, 5])
@@ -107,7 +108,7 @@ class Visualization:
         ax.set_zlim([0, 5])
 
         # Set viewing angle
-        ax.view_init(elev=30, azim=45)
+        ax.view_init(elev=7, azim=21)
 
         # Add grid
         ax.grid(True)

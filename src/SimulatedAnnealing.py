@@ -38,7 +38,9 @@ class SimulatedAnnealing:
     def simulatedAnnealing(self, current: MagicCube) -> MagicCube:
         random_successor = MagicCube()
         no_improvement_steps = 0
+        probability = 0
         self.curretValue.append(current.value)
+        
         while self.getTemperature() > self.min_temperature:
             print(self.getTemperature())
             random_successor = current.randomSuccessor()
@@ -46,13 +48,13 @@ class SimulatedAnnealing:
 
             if delta >= 0:
                 current = random_successor
+                probability = 1
                 if delta == 0:
                     no_improvement_steps += 0
                 else :
                     no_improvement_steps = 0
             else:
                 probability = 2.71828 ** (delta / self.getTemperature())
-                self.eulerValue.append(probability)
                 self.stuck += 1
                 if probability > self.probability:
                     current = random_successor
@@ -60,11 +62,11 @@ class SimulatedAnnealing:
                 else:
                     no_improvement_steps += 1
 
+            self.eulerValue.append(probability)
             self.curretValue.append(current.value)
             self.iteration += 1    
 
             # self.temperature *= self.alpha
-
             
             if no_improvement_steps // 2000 > 0:
                 if no_improvement_steps // 2000 > 0:
@@ -77,11 +79,8 @@ class SimulatedAnnealing:
             else:
                 self.probability = 0.3
                 self.temperature = self.temperature * self.alpha_cold
-                
 
             if current.value == 0 :
-                return current, self.curretValue, self.iteration
+                return current
 
-
-        return current, self.curretValue, self.iteration, self.stuck, self.eulerValue
-
+        return current

@@ -8,17 +8,17 @@ import time
 if __name__ == "__main__":
     while True:
         print("Choose one of the following algorithms:")
-        print("1. Steepest Ascent Hill Climbing")
-        print("2. Sideways Move Hill Climbing")
-        print("3. Random Restart Hill Climbing")
-        print("4. Stochastic Hill Climbing")
+        print("1. Steepest Ascent Hill-Climbing")
+        print("2. Hill-Climbing with Sideways Move")
+        print("3. Random Restart Hill-Climbing")
+        print("4. Stochastic Hill-Climbing")
         print("5. Simulated Annealing")
         print("6. Genetic Algorithm")
         print("7. Exit")
 
         choice = input("Enter the number of the algorithm you want to use: ")
 
-        if choice == "1": # Steepest Ascent Hill Climbing
+        if choice == "1": # Steepest Ascent Hill-Climbing
             cube = MagicCube()
             hill_climbing = HillClimbing()
 
@@ -28,6 +28,7 @@ if __name__ == "__main__":
             time_execution = end - start
             
             array_stats_text = f"""
+            Statistik Algoritma Steepest Ascent Hill-Climbing
             Initial Value        : {cube.value}
             Final Value          : {result.value}
             Number of Iterations : {len(objective_value) - 1}
@@ -36,7 +37,7 @@ if __name__ == "__main__":
 
             Visualization.plot(objective_value, array_stats_text, cube, result)
 
-        elif choice == "2": # Sideways Move Hill Climbing
+        elif choice == "2": # Hill-Climbing with Sideways Move
             max_iterations = int(input("Enter the maximum number of sideways moves: "))
 
             cube = MagicCube()
@@ -48,6 +49,7 @@ if __name__ == "__main__":
             time_execution = end - start
 
             array_stats_text = f"""
+            Statistik Algoritma Hill-Climbing with Sideways Move
             Initial Value        : {cube.value}
             Final Value          : {result.value}
             Number of Iterations : {len(objective_value) - 1}
@@ -56,7 +58,7 @@ if __name__ == "__main__":
 
             Visualization.plot(objective_value, array_stats_text, cube, result)
 
-        elif choice == "3": # Random Restart Hill Climbing
+        elif choice == "3": # Random Restart Hill-Climbing
             max_restarts = int(input("Enter the maximum number of restarts: "))
             cube = MagicCube()
             hill_climbing = HillClimbing()
@@ -67,6 +69,7 @@ if __name__ == "__main__":
             time_execution = end - start
             
             array_stats_text = f"""
+            Statistik Algoritma Random Restart Hill-Climbing
             Initial Value        : {cube.value}
             Final Value          : {result.value}
             Time Execution       : {time_execution:.2f} seconds
@@ -79,7 +82,7 @@ if __name__ == "__main__":
 
             Visualization.plot(objective_values, array_stats_text, cube, result)
 
-        elif choice == "4": # Stochastic Hill Climbing
+        elif choice == "4": # Stochastic Hill-Climbing
             max_iterations = int(input("Enter the maximum number of iterations: "))
             cube = MagicCube()                
             hill_climbing = HillClimbing()
@@ -90,6 +93,7 @@ if __name__ == "__main__":
             time_execution = end - start
 
             array_stats_text = f"""
+            Statistik Algoritma Stochastic Hill-Climbing
             Initial Value        : {cube.value}
             Final Value          : {result.value}
             Number of Iterations : {number_of_iterations+1}
@@ -101,21 +105,19 @@ if __name__ == "__main__":
         elif choice == "5": # Simulated Annealing
             cube = MagicCube()
             sa = SimulatedAnnealing()
+
             start = time.time()
-            resultCube, valuePerIteration, totalIteration, stuck, euler = sa.simulatedAnnealing(cube)
+            resultCube = sa.simulatedAnnealing(cube)
             end = time.time()
             time_execution = end - start
 
             array_stats_text = f"""
-            Initial Value        : {cube.value}
-            Final Value          : {resultCube.value}
-            Number of Iterations : {totalIteration}
-            Time Execution       : {time_execution:.2f} seconds
-            Stuck di local optima: {stuck}
+            Statistik Algoritma Simulated Annealing
+            Initial Value        : {cube.value}             Number of Iterations : {sa.iteration}             Stuck di local optima: {sa.stuck}
+            Final Value          : {resultCube.value}              Time Execution       : {time_execution:.2f} seconds
             """
-            Visualization.plot(valuePerIteration, array_stats_text, cube, resultCube, None, euler)
 
-
+            Visualization.plot(sa.curretValue, array_stats_text, cube, resultCube, None, sa.eulerValue)
 
         elif choice == "6": # Genetic Algorithm
             ga = GeneticAlgorithm()
@@ -133,6 +135,7 @@ if __name__ == "__main__":
             max_initial_cube = ga.max_initial_cube
             max_final_cube = ga.max_final_cube
             array_stats_text = f"""
+            Statistik Algoritma Genetic Algorithm
             Initial Maksimum Value    : {ga.value_max_history[0]}
             Final Maksimum Value      : {ga.value_max_history[-1]}
             Maksimum Value Achieved   : {ga.value_max_history.max()}
