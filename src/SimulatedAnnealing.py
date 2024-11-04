@@ -1,6 +1,4 @@
 from MagicCube import MagicCube
-import random
-import time
 
 class SimulatedAnnealing:
     def __init__(self):
@@ -22,7 +20,7 @@ class SimulatedAnnealing:
         Mengembalikan suhu saat ini
 
         Returns:
-        float: suhu saat ini
+            float: suhu saat ini
         """
         return self.temperature
 
@@ -31,11 +29,20 @@ class SimulatedAnnealing:
         Mengatur suhu saat ini
 
         Args:
-        temperature (float): suhu yang akan diatur
+            temperature (float): suhu yang akan diatur
         """
         self.temperature = temperature
 
     def simulatedAnnealing(self, current: MagicCube) -> MagicCube:
+        """
+        Algoritma Simulated Annealing
+
+        Args:
+            current (MagicCube): objek kubus magic
+
+        Returns:
+            MagicCube: kube magic hasil pencarian
+        """
         random_successor = MagicCube()
         no_improvement_steps = 0
         probability = 0
