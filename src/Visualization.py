@@ -7,7 +7,7 @@ class Visualization:
     @staticmethod
     def plot(objective_value: list, message: str, 
             initial_cube: MagicCube, final_cube: MagicCube,
-            avg_objective_value: list = None) -> None:
+            avg_objective_value: list = None, euler_value: list = None) -> None:
             """
             membuat plot hasil pencarian
 
@@ -20,7 +20,7 @@ class Visualization:
             """
             # Membuat figure dengan gridspec dan mengatur rasio
             fig = plt.figure(figsize=(15, 12))
-            gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[70, 30])
+            gs = fig.add_gridspec(3, 2, height_ratios=[30, 10, 65], width_ratios=[70, 30])
 
             # Baris 1, Kolom 1: Grafik garis nilai objektif
             ax1 = fig.add_subplot(gs[0, 0])
@@ -34,8 +34,20 @@ class Visualization:
             ax1.set_ylabel("Objective Value")
             ax1.legend()
 
+            if euler_value is not None:
+                axEuler = fig.add_subplot(gs[0,1])
+                axEuler.plot(euler_value, label="Euler Value")
+                axEuler.set_title("Euler Value")
+                axEuler.set_xlabel("Iteration")
+                axEuler.set_ylabel("Euler Value")
+                axEuler.legend()
+
+
             # Baris 1, Kolom 2: Statistik algoritma genetika
-            ax2 = fig.add_subplot(gs[0, 1])
+            if euler_value is None:
+                ax2 = fig.add_subplot(gs[0, 1])
+            else :
+                ax2 = fig.add_subplot(gs[1, 0])
             array_stats_text = message
 
             ax2.axis("off")

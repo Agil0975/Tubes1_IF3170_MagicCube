@@ -13,7 +13,9 @@ class SimulatedAnnealing:
         self.min_temperature = 0.00001
         self.iteration = 0
         self.curretValue = [] 
+        self.eulerValue = []
         self.probability = 0.3
+        self.stuck = 0
 
     def getTemperature(self) -> float:
         """
@@ -49,6 +51,8 @@ class SimulatedAnnealing:
                     no_improvement_steps = 0
             else:
                 probability = 2.71828 ** (delta / self.getTemperature())
+                self.eulerValue.append(probability)
+                self.stuck += 1
                 if probability > self.probability:
                     current = random_successor
                     no_improvement_steps = 0  # Reset counter on acceptance
@@ -78,5 +82,5 @@ class SimulatedAnnealing:
                 return current, self.curretValue, self.iteration
 
 
-        return current, self.curretValue, self.iteration
+        return current, self.curretValue, self.iteration, self.stuck, self.eulerValue
 

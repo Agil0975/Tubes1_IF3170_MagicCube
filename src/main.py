@@ -102,7 +102,7 @@ if __name__ == "__main__":
             cube = MagicCube()
             sa = SimulatedAnnealing()
             start = time.time()
-            resultCube, valuePerIteration, totalIteration = sa.simulatedAnnealing(cube)
+            resultCube, valuePerIteration, totalIteration, stuck, euler = sa.simulatedAnnealing(cube)
             end = time.time()
             time_execution = end - start
 
@@ -111,9 +111,10 @@ if __name__ == "__main__":
             Final Value          : {resultCube.value}
             Number of Iterations : {totalIteration}
             Time Execution       : {time_execution:.2f} seconds
+            Stuck di local optima: {stuck}
             """
-
-            Visualization.plot(valuePerIteration, array_stats_text, cube, resultCube)
+            print(euler[:100])
+            Visualization.plot(valuePerIteration, array_stats_text, cube, resultCube, None, euler)
 
 
 
