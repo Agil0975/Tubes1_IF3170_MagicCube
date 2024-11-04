@@ -143,14 +143,14 @@ class GeneticAlgorithm:
         elif type == 2:
             # pilih dua indeks secara acak
             start = np.random.randint(125)
-            end = np.random.randint(start, min(126, start+20))
+            end = np.random.randint(start, min(126, start+50))
             # scramble elemen pada range tertentu
             individu.scramble(start, end)
         # mutasi inverse
         elif type == 3:
             # pilih dua indeks secara acak
             start = np.random.randint(125)
-            end = np.random.randint(start, min(126, start+20))
+            end = np.random.randint(start, min(126, start+50))
             # balik elemen pada range tertentu
             individu.inverse(start, end)
         return

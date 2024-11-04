@@ -78,7 +78,7 @@ if __name__ == "__main__":
             """
 
             for i in range(1, restart+1):
-                array_stats_text += f"\nRestart {i} : {iterations_per_restart[i]} iterations"
+                array_stats_text += f"\n              Restart {i} : {iterations_per_restart[i]} iterations"
 
             Visualization.plot(objective_values, array_stats_text, cube, result)
 
@@ -137,7 +137,9 @@ if __name__ == "__main__":
             array_stats_text = f"""
             Statistik Algoritma Genetic Algorithm
             Initial Maksimum Value    : {ga.value_max_history[0]}
+            Initial Average Value     : {ga.value_avg_history[0]}
             Final Maksimum Value      : {ga.value_max_history[-1]}
+            Final Average Value       : {ga.value_avg_history[-1]}
             Maksimum Value Achieved   : {ga.value_max_history.max()}
             Jumlah Populasi           : {max_population}
             Jumlah Generasi (Iterasi) : {generation}
