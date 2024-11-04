@@ -28,7 +28,29 @@ A 5x5x5 Diagonal Magic Cube solver using:
 
 3. Install the python libraries using pip
    ```
-   pip install 
+   pip install numpy
+   pip install matplotlib
    ```
 
-## Run
+You can also see the list of libraries in requirements.txt
+
+## How to Run
+
+1. Go to the src folder
+   ```
+   cd src
+   ```
+
+2. Run !!!
+   ```
+   python main.py
+   ```
+
+## List of Tasks
+
+| NIM | Name | Tasks |
+|:-:|:-:|:-:|
+| 13522006 | Agil Fadillah Sabri | Genetic Algorithm |
+| 13522027 | Muhammad Althariq Fairuz | Steepest Ascent Hill-climbing, Hill-climbing with Sideways Move |
+| 13522034 | Bastian H. Suryapratama | Random Restart Hill-climbing, Stochastic Hill-climbing |
+| 13522052 | Haikal Assyauqi | Simulated Annealing |
