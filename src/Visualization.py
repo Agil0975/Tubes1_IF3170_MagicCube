@@ -20,7 +20,10 @@ class Visualization:
             """
             # Membuat figure dengan gridspec dan mengatur rasio
             fig = plt.figure(figsize=(15, 12))
-            gs = fig.add_gridspec(3, 2, height_ratios=[30, 10, 65], width_ratios=[70, 30])
+            if euler_value is None:
+                gs = fig.add_gridspec(3, 2, height_ratios=[30, 5, 65], width_ratios=[70, 30])
+            else:
+                gs = fig.add_gridspec(3, 2, height_ratios=[35, 2, 40], width_ratios=[50, 50])
 
             # Baris 1, Kolom 1: Grafik garis nilai objektif
             ax1 = fig.add_subplot(gs[0, 0])
@@ -65,6 +68,7 @@ class Visualization:
             Visualization.visualize_3d_cube(ax4, final_cube, "Final Cube")
 
             plt.tight_layout()
+            plt.subplots_adjust(hspace=0.45, wspace=0.3)
             plt.show()
 
     @staticmethod
