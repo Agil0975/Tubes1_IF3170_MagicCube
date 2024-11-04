@@ -71,144 +71,55 @@ class GeneticAlgorithm:
 
         return parent1, parent2
         
-    def __crossover(self, parent1: MagicCube, parent2: MagicCube, type: int) -> tuple[MagicCube, MagicCube]:
+    def __crossover(self, parent1: MagicCube, parent2: MagicCube) -> tuple[MagicCube, MagicCube]:
         """
         Crossover dua individu
+        Crossover yang dilakukan adalah Order Crossover
+        Crossover dilakukan dengan mengubah parent menjadi array 1 dimensi dan melakukan crossover pada array tersebut
 
         Args:
             parent1 (MagicCube): individu pertama
             parent2 (MagicCube): individu kedua
-            type (int): tipe crossover
-                        1: bidang-xy
-                        2: bidang-xz
-                        3: bidang-yz
+
         Returns:
             tuple[MagicCube, MagicCube]: dua individu hasil crossover
         """
-        # Pilih dua titik potong secara acak
-        cut = np.random.randint(1,4)
-        child1 = child2 = None
+        # Pilih titik potong secara acak
+        point = np.random.randint(125)
+
+        # Ubah ke 1 dimensi
+        parent1_cube = parent1.cube.flatten()
+        parent2_cube = parent2.cube.flatten()
+        child1_cube = np.zeros(125)
+        child2_cube = np.zeros(125)
         
         # Crossover
-        if type == 1:
-            child1 = self.__order_crossover_xy(parent1, parent2, cut)
-            child2 = self.__order_crossover_xy(parent2, parent1, cut)
-        elif type == 2:
-            child1 = self.__order_crossover_xz(parent1, parent2, cut)
-            child2 = self.__order_crossover_xz(parent2, parent1, cut)
-        elif type == 3:
-            child1 = self.__order_crossover_yz(parent1, parent2, cut)
-            child2 = self.__order_crossover_yz(parent2, parent1, cut)
+        child1_cube[:point] = parent1_cube[:point]
+        child2_cube[:point] = parent2_cube[:point]
+
+        # Cari elemen yang belum ada pada child
+        idx1 = 0
+        idx2 = 0
+        for i in range(point, 125):
+            while parent2_cube[idx2] in child1_cube[:i]:
+                idx2 += 1
+            while parent1_cube[idx1] in child2_cube[:i]:
+                idx1 += 1
+            child1_cube[i] = parent2_cube[idx2]
+            child2_cube[i] = parent1_cube[idx1]
+            idx1 += 1
+            idx2 += 1
+
+        # Ubah kembali ke 3 dimensi
+        child1 = MagicCube()
+        child1.cube = child1_cube.reshape(5,5,5)
+        child1.refresh()
+
+        child2 = MagicCube()
+        child2.cube = child2_cube.reshape(5,5,5)
+        child2.refresh()
 
         return child1, child2
-    
-    def __order_crossover_xy(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
-        """
-        Crossover dengan order crossover pada bidang xy
-
-        Args:
-            parent1 (MagicCube): individu pertama
-            parent2 (MagicCube): individu kedua
-            cut (int): titik potong
-
-        Returns:
-            MagicCube: individu hasil crossover
-        """
-        child = MagicCube()
-        child.cube = np.zeros((5, 5, 5), dtype=int)
-        child.cube[:cut, :, :] = parent1.cube[:cut, :, :]
-
-        # isi elemen yang belum ada dengan elemen dari parent2 berdasarkan urutan kemunculan di parent2
-        child_x = cut
-        child_y = 0
-        child_z = 0
-
-        # tempatkan elemen yang belum ada dengan urutan kemunculan di parent2
-        for x in range(5):
-            for y in range(5):
-                for z in range(5):
-                    if parent2.cube[x, y, z] not in child.cube:
-                        child.cube[child_x, child_y, child_z] = parent2.cube[x, y, z]
-                        child_z += 1
-                        if child_z == 5:
-                            child_z = 0
-                            child_y += 1
-                            if child_y == 5:
-                                child_y = 0
-                                child_x += 1
-        return child
-    
-    def __order_crossover_xz(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
-        """
-        Crossover dengan order crossover pada bidang xz
-
-        Args:
-            parent1 (MagicCube): individu pertama
-            parent2 (MagicCube): individu kedua
-            cut (int): titik potong
-
-        Returns:
-            MagicCube: individu hasil crossover
-        """
-        child = MagicCube()
-        child.cube = np.zeros((5, 5, 5), dtype=int)
-        child.cube[:, :cut, :] = parent1.cube[:, :cut, :]
-
-        # isi elemen yang belum ada dengan elemen dari parent2 berdasarkan urutan kemunculan di parent2
-        child_x = 0
-        child_y = cut
-        child_z = 0
-
-        # tempatkan elemen yang belum ada dengan urutan kemunculan di parent2
-        for x in range(5):
-            for y in range(5):
-                for z in range(5):
-                    if parent2.cube[x, y, z] not in child.cube:
-                        child.cube[child_x, child_y, child_z] = parent2.cube[x, y, z]
-                        child_z += 1
-                        if child_z == 5:
-                            child_z = 0
-                            child_y += 1
-                            if child_y == 5:
-                                child_y = cut
-                                child_x += 1
-        return child
-
-    def __order_crossover_yz(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
-        """
-        Crossover dengan order crossover pada bidang yz
-
-        Args:
-            parent1 (MagicCube): individu pertama
-            parent2 (MagicCube): individu kedua
-            cut (int): titik potong
-
-        Returns:
-            MagicCube: individu hasil crossover
-        """
-        child = MagicCube()
-        child.cube = np.zeros((5, 5, 5), dtype=int)
-        child.cube[:, :, :cut] = parent1.cube[:, :, :cut]
-
-        # isi elemen yang belum ada dengan elemen dari parent
-        child_x = 0
-        child_y = 0
-        child_z = cut
-
-        # tempatkan elemen yang belum ada dengan urutan kemunculan di parent2
-        for x in range(5):
-            for y in range(5):
-                for z in range(5):
-                    if parent2.cube[x, y, z] not in child.cube:
-                        child.cube[child_x, child_y, child_z] = parent2.cube[x, y, z]
-                        child_z += 1
-                        if child_z == 5:
-                            child_z = cut
-                            child_y += 1
-                            if child_y == 5:
-                                child_y = 0
-                                child_x += 1
-        return child
             
     def __mutation(self, individu: MagicCube, type: int = 1) -> None:
         """
@@ -288,16 +199,16 @@ class GeneticAlgorithm:
             # Seleksi dan Crossover
             for _ in range((population_size - len(next_generation)) // 2):
                 parent1, parent2 = self.__selection(roulette_wheel)
-                child1, child2 = self.__crossover(parent1, parent2, np.random.randint(1, 4))
+                child1, child2 = self.__crossover(parent1, parent2)
                 next_generation.extend([child1, child2])
 
             # Mutasi
             if patient < max_stuck: # mutasi rendah
-                for i in range(1, len(next_generation)): # lewati individu terbaik
+                for i in range(len(next_generation)): # lewati individu terbaik
                     if np.random.random() < batas_mutasi_rendah:
                         self.__mutation(next_generation[i], np.random.randint(1, 4))
             else:   # mutasi tinggi
-                for i in range(1, len(next_generation)): # lewati individu terbaik
+                for i in range(len(next_generation)): # lewati individu terbaik
                     if np.random.random() < batas_mutasi_tinggi:
                         self.__mutation(next_generation[i], np.random.randint(1, 4))
 
