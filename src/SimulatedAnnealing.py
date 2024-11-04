@@ -19,12 +19,11 @@ class SimulatedAnnealing:
         """
         Mengembalikan suhu saat ini
 
-        return:
+        Returns:
         float: suhu saat ini
         """
         return self.temperature
-    
-    
+
     def setTemperature(self, temperature: float) -> None:
         """
         Mengatur suhu saat ini

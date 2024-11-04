@@ -2,6 +2,7 @@ from MagicCube import MagicCube
 from HillClimbing import HillClimbing
 from GeneticAlgorithm import GeneticAlgorithm
 from Visualization import Visualization
+from SimulatedAnnealing import SimulatedAnnealing
 import time
 
 if __name__ == "__main__":
@@ -98,7 +99,23 @@ if __name__ == "__main__":
             Visualization.plot(objective_values, array_stats_text, cube, result)
 
         elif choice == "5": # Simulated Annealing
-            print("Simulated Annealing")
+            cube = MagicCube()
+            sa = SimulatedAnnealing()
+            start = time.time()
+            resultCube, valuePerIteration, totalIteration = sa.simulatedAnnealing(cube)
+            end = time.time()
+            time_execution = end - start
+
+            array_stats_text = f"""
+            Initial Value        : {cube.value}
+            Final Value          : {resultCube.value}
+            Number of Iterations : {totalIteration}
+            Time Execution       : {time_execution:.2f} seconds
+            """
+
+            Visualization.plot(valuePerIteration, array_stats_text, cube, resultCube)
+
+
 
         elif choice == "6": # Genetic Algorithm
             ga = GeneticAlgorithm()
