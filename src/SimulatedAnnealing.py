@@ -70,7 +70,7 @@ class SimulatedAnnealing:
                     minus = no_improvement_steps // 2000
                 elif no_improvement_steps // 2000 > 6:
                     minus = 2.9
-                if current.value < -50 and self.temperature > 0.001:
+                if current.value < -52 and self.temperature > 0.001:
                     self.probability = 0.3 + 0.05 * (1 - minus)
                 self.temperature = self.temperature * self.alpha
             else:
