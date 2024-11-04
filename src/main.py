@@ -113,7 +113,6 @@ if __name__ == "__main__":
             Time Execution       : {time_execution:.2f} seconds
             Stuck di local optima: {stuck}
             """
-            print(euler[5000:6000])
             Visualization.plot(valuePerIteration, array_stats_text, cube, resultCube, None, euler)
 
 
