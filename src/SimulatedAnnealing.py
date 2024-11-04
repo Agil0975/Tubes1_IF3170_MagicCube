@@ -1,24 +1,31 @@
 from MagicCube import MagicCube
 import random
+import time
 
 class SimulatedAnnealing:
     def __init__(self):
         """
         Constructor kelas SimulatedAnnealing
         """
-        self.temperature = 10
+        self.temperature = 1
+        self.alpha_cold = 0.99999
         self.alpha = 0.9999
-        self.min_temperature = 0.0001
+        self.min_temperature = 0.00001
+        self.iteration = 0
+        self.curretValue = [] 
+        self.eulerValue = []
+        self.probability = 0.3
+        self.stuck = 0
 
     def getTemperature(self) -> float:
         """
         Mengembalikan suhu saat ini
 
-        return:
+        Returns:
         float: suhu saat ini
         """
         return self.temperature
-    
+
     def setTemperature(self, temperature: float) -> None:
         """
         Mengatur suhu saat ini
@@ -30,17 +37,8 @@ class SimulatedAnnealing:
 
     def simulatedAnnealing(self, current: MagicCube) -> MagicCube:
         random_successor = MagicCube()
-        # print(random_successor.cube)
-        """
-        melakukan pencarian simulated annealing pada kubus magic
-
-        Args:
-            cube (MagicCube): objek kubus magic
-
-        return:
-        MagicCube: objek kubus hasil pencarian
-        """
         no_improvement_steps = 0
+        self.curretValue.append(current.value)
         while self.getTemperature() > self.min_temperature:
             random_successor = current.randomSuccessor()
             delta = random_successor.value - current.value
@@ -48,36 +46,41 @@ class SimulatedAnnealing:
             if delta >= 0:
                 current = random_successor
                 if delta == 0:
-                    no_improvement_steps += 1
+                    no_improvement_steps += 0
                 else :
                     no_improvement_steps = 0
             else:
                 probability = 2.71828 ** (delta / self.getTemperature())
-                if random.random() < probability:
+                self.eulerValue.append(probability)
+                self.stuck += 1
+                if probability > self.probability:
                     current = random_successor
                     no_improvement_steps = 0  # Reset counter on acceptance
                 else:
                     no_improvement_steps += 1
 
-            # Adaptive cooling: if no improvement for a while, cool faster
-            if no_improvement_steps > 10 and self.getTemperature() > 1:
-                self.setTemperature(self.getTemperature() * self.alpha * 0.99)
-                print("Cooling faster")
-            else:
-                self.setTemperature(self.getTemperature() * self.alpha)
-                
+            self.curretValue.append(current.value)
+            self.iteration += 1    
 
             # self.temperature *= self.alpha
 
+            
+            if no_improvement_steps // 2000 > 0:
+                if no_improvement_steps // 2000 > 0:
+                    minus = no_improvement_steps // 2000
+                elif no_improvement_steps // 2000 > 6:
+                    minus = 2.9
+                if current.value < -52 and self.temperature > 0.001:
+                    self.probability = 0.3 + 0.05 * (1 - minus)
+                self.temperature = self.temperature * self.alpha
+            else:
+                self.probability = 0.3
+                self.temperature = self.temperature * self.alpha_cold
+                
+
             if current.value == 0 :
-                return current
+                return current, self.curretValue, self.iteration
 
 
-        return current
-    
-# Testing
-sim_anneal = SimulatedAnnealing()
-cube = MagicCube()
-cube = sim_anneal.simulatedAnnealing(cube)
-print(cube.value)
-    
+        return current, self.curretValue, self.iteration, self.stuck, self.eulerValue
+

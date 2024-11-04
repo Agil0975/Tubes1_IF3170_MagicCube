@@ -74,6 +74,42 @@ class MagicCube:
             count_mismatch += 1
         
         return -count_mismatch 
+    
+    def sumOfError(self) -> int:
+        """
+        mengembalikan nilai objektif dari kubus
+        value = -(banyaknya baris, kolom, tiang, dan diagonal yang belum berjumlah 315)
+        range value = (-109, 0)
+        
+        return:
+        int: nilai objektif kubus
+        """
+        target = 315
+        sum = 0
+
+        # Mengecek baris, kolom, dan tiang
+        for i in range(5):
+            for j in range(5):
+                sum += abs(np.sum(self[i, j, :]) - target) # Baris
+                sum += abs(np.sum(self[i, :, j]) - target)  # Kolom
+                sum += abs(np.sum(self[:, i, j]) - target)  # Tiang
+
+        # Mengecek diagonal pada setiap potongan bidang
+        for i in range(5):
+            sum += abs(np.sum(np.diagonal(self[i, :, :])) - target)  # Diagonal bidang xy
+            sum += abs(np.sum(np.diagonal(self[:, i, :])) - target)  # Diagonal bidang xz
+            sum += abs(np.sum(np.diagonal(self[:, :, i])) - target)  # Diagonal bidang yz
+            sum += abs(np.sum(np.diagonal(np.fliplr(self[i, :, :]))) - target)  # Diagonal bidang xy (berlawanan)
+            sum += abs(np.sum(np.diagonal(np.fliplr(self[:, i, :]))) - target)  # Diagonal bidang xz (berlawanan)
+            sum += abs(np.sum(np.diagonal(np.fliplr(self[:, :, i]))) - target)  # Diagonal bidang yz (berlawanan)
+
+        # Mengecek diagonal pada kubus
+        sum += abs(np.sum([self[i, i, i] for i in range(5)]) - target)  # Diagonal ruang 1
+        sum += abs(np.sum([self[i, i, 4 - i] for i in range(5)]) - target)  # Diagonal ruang 2
+        sum += abs(np.sum([self[i, 4 - i, i] for i in range(5)]) - target)  # Diagonal ruang 3
+        sum += abs(np.sum([self[4 - i, i, i] for i in range(5)]) - target)  # Diagonal ruang 4
+        
+        return -sum
 
     def __fitness(self) -> int:
         """
@@ -136,12 +172,12 @@ class MagicCube:
         self.cube = cube.reshape(5,5,5)
         self.refresh()
 
-    def highestSuccessor(self) -> None:
+    def highestSuccessor(self) -> 'MagicCube':
         """
         mengembalikan succussor dengan objective value tertinggi
 
         return:
-        Cube: objek kubus successor
+        MagicCube: objek kubus successor
         """
         max_value = -109
         max_cube = None
@@ -160,12 +196,12 @@ class MagicCube:
                                     max_cube = new_cube
         return max_cube
 
-    def randomSuccessor(self) -> None:
+    def randomSuccessor(self) -> 'MagicCube':
         """
         mengembalikan succussor secara random
 
         return:
-        Cube: objek kubus successor
+        MagicCube: objek kubus successor
         """
         first_elmt = tuple(np.random.randint(5, size=3))
         second_elmt = tuple(np.random.randint(5, size=3))
@@ -177,37 +213,3 @@ class MagicCube:
         new_cube.swap(first_elmt, second_elmt)
 
         return new_cube
-
-# Testing
-if __name__ == "__main__":
-    cube = MagicCube()
-
-    print(cube.cube[0, 0, 0])
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)
-
-    high = cube.highestSuccessor()
-    # print(high.cube)
-    print(high.value)
-    print(high.fitness)
-    
-    random = cube.randomSuccessor()
-    # print(random.cube)
-    print(random.value)
-    print(random.fitness)
-
-    cube.swap((0, 0, 0), (0, 0, 1))
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)
-
-    cube.scramble(0, 10)
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)
-
-    cube.inverse(0, 10)
-    print(cube.cube)
-    print(cube.value)
-    print(cube.fitness)

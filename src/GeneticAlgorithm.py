@@ -8,26 +8,21 @@ class GeneticAlgorithm:
         """
         Constructor kelas GeneticAlgorithm
         """
-        self.fitness_max_history = np.array([])
-        self.fitness_avg_history = np.array([])
+        self.value_max_history = np.array([])
+        self.value_avg_history = np.array([])
         self.max_initial_cube = None
         self.max_final_cube = None
 
-    def __update_history(self, population: list) -> int:
+    def __update_history(self, population: list) -> None:
         """
-        Memperbarui histori fitness maksimum dan rata-rata
+        Memperbarui histori objective value maksimum dan rata-rata
 
         Args:
             population (list): populasi saat ini
-
-        Returns:
-            int: total fitness dari populasi
         """
-        total_fitness = sum([cube.fitness for cube in population])
-        self.fitness_avg_history = np.append(self.fitness_avg_history, total_fitness / len(population))
-        self.fitness_max_history = np.append(self.fitness_max_history, population[0].fitness)
-
-        return total_fitness
+        total_value = sum([cube.value for cube in population])
+        self.value_avg_history = np.append(self.value_avg_history, total_value / len(population))
+        self.value_max_history = np.append(self.value_max_history, population[0].value)
 
     def __roulette_wheel(self, population: list, fitness_sum: int) -> list:
         """
@@ -52,7 +47,7 @@ class GeneticAlgorithm:
 
         return roulette_wheel
 
-    def __selection(self, roulette_wheel: list) -> list:
+    def __selection(self, roulette_wheel: list) -> tuple[MagicCube, MagicCube]:
         """
         Seleksi dua individu dari roulette wheel
 
@@ -60,7 +55,7 @@ class GeneticAlgorithm:
             roulette_wheel (list): list roulette wheel
 
         Returns:
-            list: dua individu terpilih
+            tuple[MagicCube, MagicCube]: dua individu yang terpilih
         """
         parent1 = parent2 = None
 
@@ -76,144 +71,55 @@ class GeneticAlgorithm:
 
         return parent1, parent2
         
-    def __crossover(self, parent1: MagicCube, parent2: MagicCube, type: int) -> list:
+    def __crossover(self, parent1: MagicCube, parent2: MagicCube) -> tuple[MagicCube, MagicCube]:
         """
         Crossover dua individu
+        Crossover yang dilakukan adalah Order Crossover
+        Crossover dilakukan dengan mengubah parent menjadi array 1 dimensi dan melakukan crossover pada array tersebut
 
         Args:
             parent1 (MagicCube): individu pertama
             parent2 (MagicCube): individu kedua
-            type (int): tipe crossover
-                        1: bidang-xy
-                        2: bidang-xz
-                        3: bidang-yz
+
         Returns:
-            list: dua individu hasil crossover
+            tuple[MagicCube, MagicCube]: dua individu hasil crossover
         """
-        # Pilih dua titik potong secara acak
-        cut = np.random.randint(1,4)
-        child1 = child2 = None
+        # Pilih titik potong secara acak
+        point = np.random.randint(125)
+
+        # Ubah ke 1 dimensi
+        parent1_cube = parent1.cube.flatten()
+        parent2_cube = parent2.cube.flatten()
+        child1_cube = np.zeros(125)
+        child2_cube = np.zeros(125)
         
         # Crossover
-        if type == 1:
-            child1 = self.__order_crossover_xy(parent1, parent2, cut)
-            child2 = self.__order_crossover_xy(parent2, parent1, cut)
-        elif type == 2:
-            child1 = self.__order_crossover_xz(parent1, parent2, cut)
-            child2 = self.__order_crossover_xz(parent2, parent1, cut)
-        elif type == 3:
-            child1 = self.__order_crossover_yz(parent1, parent2, cut)
-            child2 = self.__order_crossover_yz(parent2, parent1, cut)
+        child1_cube[:point] = parent1_cube[:point]
+        child2_cube[:point] = parent2_cube[:point]
+
+        # Cari elemen yang belum ada pada child
+        idx1 = 0
+        idx2 = 0
+        for i in range(point, 125):
+            while parent2_cube[idx2] in child1_cube[:i]:
+                idx2 += 1
+            while parent1_cube[idx1] in child2_cube[:i]:
+                idx1 += 1
+            child1_cube[i] = parent2_cube[idx2]
+            child2_cube[i] = parent1_cube[idx1]
+            idx1 += 1
+            idx2 += 1
+
+        # Ubah kembali ke 3 dimensi
+        child1 = MagicCube()
+        child1.cube = child1_cube.reshape(5,5,5)
+        child1.refresh()
+
+        child2 = MagicCube()
+        child2.cube = child2_cube.reshape(5,5,5)
+        child2.refresh()
 
         return child1, child2
-    
-    def __order_crossover_xy(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
-        """
-        Crossover dengan order crossover pada bidang xy
-
-        Args:
-            parent1 (MagicCube): individu pertama
-            parent2 (MagicCube): individu kedua
-            cut (int): titik potong
-
-        Returns:
-            MagicCube: individu hasil crossover
-        """
-        child = MagicCube()
-        child.cube = np.zeros((5, 5, 5), dtype=int)
-        child.cube[:cut, :, :] = parent1.cube[:cut, :, :]
-
-        # isi elemen yang belum ada dengan elemen dari parent2 berdasarkan urutan kemunculan di parent2
-        child_x = cut
-        child_y = 0
-        child_z = 0
-
-        # tempatkan elemen yang belum ada dengan urutan kemunculan di parent2
-        for x in range(5):
-            for y in range(5):
-                for z in range(5):
-                    if parent2.cube[x, y, z] not in child.cube:
-                        child.cube[child_x, child_y, child_z] = parent2.cube[x, y, z]
-                        child_z += 1
-                        if child_z == 5:
-                            child_z = 0
-                            child_y += 1
-                            if child_y == 5:
-                                child_y = 0
-                                child_x += 1
-        return child
-    
-    def __order_crossover_xz(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
-        """
-        Crossover dengan order crossover pada bidang xz
-
-        Args:
-            parent1 (MagicCube): individu pertama
-            parent2 (MagicCube): individu kedua
-            cut (int): titik potong
-
-        Returns:
-            MagicCube: individu hasil crossover
-        """
-        child = MagicCube()
-        child.cube = np.zeros((5, 5, 5), dtype=int)
-        child.cube[:, :cut, :] = parent1.cube[:, :cut, :]
-
-        # isi elemen yang belum ada dengan elemen dari parent2 berdasarkan urutan kemunculan di parent2
-        child_x = 0
-        child_y = cut
-        child_z = 0
-
-        # tempatkan elemen yang belum ada dengan urutan kemunculan di parent2
-        for x in range(5):
-            for y in range(5):
-                for z in range(5):
-                    if parent2.cube[x, y, z] not in child.cube:
-                        child.cube[child_x, child_y, child_z] = parent2.cube[x, y, z]
-                        child_z += 1
-                        if child_z == 5:
-                            child_z = 0
-                            child_y += 1
-                            if child_y == 5:
-                                child_y = cut
-                                child_x += 1
-        return child
-
-    def __order_crossover_yz(self, parent1: MagicCube, parent2: MagicCube, cut: int) -> MagicCube:
-        """
-        Crossover dengan order crossover pada bidang yz
-
-        Args:
-            parent1 (MagicCube): individu pertama
-            parent2 (MagicCube): individu kedua
-            cut (int): titik potong
-
-        Returns:
-            MagicCube: individu hasil crossover
-        """
-        child = MagicCube()
-        child.cube = np.zeros((5, 5, 5), dtype=int)
-        child.cube[:, :, :cut] = parent1.cube[:, :, :cut]
-
-        # isi elemen yang belum ada dengan elemen dari parent
-        child_x = 0
-        child_y = 0
-        child_z = cut
-
-        # tempatkan elemen yang belum ada dengan urutan kemunculan di parent2
-        for x in range(5):
-            for y in range(5):
-                for z in range(5):
-                    if parent2.cube[x, y, z] not in child.cube:
-                        child.cube[child_x, child_y, child_z] = parent2.cube[x, y, z]
-                        child_z += 1
-                        if child_z == 5:
-                            child_z = cut
-                            child_y += 1
-                            if child_y == 5:
-                                child_y = 0
-                                child_x += 1
-        return child
             
     def __mutation(self, individu: MagicCube, type: int = 1) -> None:
         """
@@ -253,7 +159,7 @@ class GeneticAlgorithm:
             population: list, 
             population_size: int,
             max_generation: int
-            ) -> tuple:
+            ) -> tuple[float, int]:
         """
         Menjalankan algoritma genetika
 
@@ -263,12 +169,13 @@ class GeneticAlgorithm:
             max_generation (int): maksimum generasi
             
         Returns:
-            tuple: waktu eksekusi, ukuran populasi, jumlah generasi
+            tuple: waktu eksekusi, generasi terakhir
         """
         current_generation = population
         generation = 0
         patient = 0 # jumlah generasi tanpa perubahan fitness terbaik
-        total_fitness = self.__update_history(current_generation)
+        total_fitness = sum([cube.fitness for cube in current_generation])
+        self.__update_history(current_generation)
         self.max_initial_cube = current_generation[0]
 
         max_stuck = 0.1 * max_generation
@@ -292,26 +199,27 @@ class GeneticAlgorithm:
             # Seleksi dan Crossover
             for _ in range((population_size - len(next_generation)) // 2):
                 parent1, parent2 = self.__selection(roulette_wheel)
-                child1, child2 = self.__crossover(parent1, parent2, np.random.randint(1, 4))
+                child1, child2 = self.__crossover(parent1, parent2)
                 next_generation.extend([child1, child2])
 
             # Mutasi
             if patient < max_stuck: # mutasi rendah
-                for i in range(1, len(next_generation)): # lewati individu terbaik
+                for i in range(len(next_generation)): # lewati individu terbaik
                     if np.random.random() < batas_mutasi_rendah:
                         self.__mutation(next_generation[i], np.random.randint(1, 4))
             else:   # mutasi tinggi
-                for i in range(1, len(next_generation)): # lewati individu terbaik
+                for i in range(len(next_generation)): # lewati individu terbaik
                     if np.random.random() < batas_mutasi_tinggi:
                         self.__mutation(next_generation[i], np.random.randint(1, 4))
 
             # Update generasi
             current_generation = next_generation
             current_generation.sort(key=lambda x: x.fitness, reverse=True)
-            total_fitness = self.__update_history(current_generation)
+            total_fitness = sum([cube.fitness for cube in current_generation])
+            self.__update_history(current_generation)
 
             # Update patient
-            if self.fitness_max_history[-1] == self.fitness_max_history[-2]:
+            if self.value_max_history[-1] == self.value_max_history[-2]:
                 patient += 1
             else:
                 patient = 0
@@ -321,43 +229,3 @@ class GeneticAlgorithm:
 
         self.max_final_cube = current_generation[0]
         return end - start, generation
-
-
-
-
-
-# Testing
-if __name__ == "__main__":
-    ga = GeneticAlgorithm()
-    # populasi
-    jumlah_populasi = 100
-    banyak_generasi = 100
-    population = [MagicCube() for _ in range(jumlah_populasi)]
-    population.sort(key=lambda x: x.fitness, reverse=True)
-    
-    # for cube in population:
-    #     print(cube.fitness)
-    # total_fitness = sum([cube.fitness for cube in population])
-    
-    # # roulette_wheel test
-    # roulette_wheel = ga._GeneticAlgorithm__roulette_wheel(population, total_fitness)
-    # for probability, cube in roulette_wheel:
-    #     print(cube.fitness, probability)
-    
-    # # selection test
-    # parent1, parent2 = ga._GeneticAlgorithm__selection(roulette_wheel)
-    # print(parent1.fitness)
-    # print(parent2.fitness)
-
-    # # crossover test
-    # child1, child2 = ga._GeneticAlgorithm__crossover(parent1, parent2, 1)
-    # print(child1.fitness)
-    # print(child2.fitness)
-
-    # # mutation test
-    # ga._GeneticAlgorithm__mutation(child1, 1)
-    # print(child1.fitness)
-    # ga._GeneticAlgorithm__mutation(child1, 2)
-    # print(child1.fitness)
-    # ga._GeneticAlgorithm__mutation(child1, 3)
-    # print(child1.fitness)
